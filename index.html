@@ -25,9 +25,78 @@
         .container {
             text-align: center;
             padding: 2rem;
-            max-width: 600px;
+            max-width: 760px;
             position: relative;
             z-index: 2;
+        }
+
+        .tabs {
+            display: inline-flex;
+            gap: 0.5rem;
+            padding: 0.35rem;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.18);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            margin-bottom: 1.2rem;
+        }
+
+        .tab {
+            border: 0;
+            cursor: pointer;
+            padding: 0.55rem 0.9rem;
+            border-radius: 999px;
+            color: rgba(255, 255, 255, 0.9);
+            background: transparent;
+            font-size: 0.95rem;
+            letter-spacing: 0.2px;
+            transition: background 180ms ease, transform 180ms ease;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .story {
+            text-align: right;
+            margin-top: 1rem;
+            padding: 1.2rem 1.1rem;
+            border-radius: 18px;
+            background: rgba(0, 0, 0, 0.22);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .story-title {
+            margin: 0 0 0.7rem 0;
+            font-weight: 500;
+            font-size: 1.35rem;
+            text-align: right;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        .story p {
+            margin: 0 0 0.9rem 0;
+            line-height: 1.9;
+            font-size: 1.05rem;
+            opacity: 0.95;
+        }
+
+        .story p:last-child {
+            margin-bottom: 0;
         }
 
         .main-text {
@@ -149,14 +218,116 @@
         <div class="shape"></div>
         <div class="shape"></div>
     </div>
-    
+
     <div class="container">
-        <h1 class="main-text">
-            Still Don't Know What to Put Here
-        </h1>
-        <p class="subtitle">
-            Just bought the domain<span class="dots">...</span>
-        </p>
+        <nav class="tabs" aria-label="Site sections">
+            <button class="tab active" type="button" data-tab="home">Home</button>
+            <button class="tab" type="button" data-tab="stories">סיפורים קצרים</button>
+        </nav>
+
+        <section class="tab-panel active" id="home" role="tabpanel">
+            <h1 class="main-text">Still Don't Know What to Put Here</h1>
+            <p class="subtitle">Just bought the domain<span class="dots">...</span></p>
+        </section>
+
+        <section class="tab-panel" id="stories" role="tabpanel" dir="rtl" lang="he">
+            <h1 class="main-text">סיפורים קצרים</h1>
+            <div class="story">
+                <h2 class="story-title">יאיר: באגים ביום, פשע בלילה</h2>
+                <p>
+                    ביום יאיר היה עוד מתכנת — כזה שמדבר בשקט, שותה קפה שחור ומחלק את העולם לשתי קטגוריות: דברים שניתן לשחזר, ודברים שלא.
+                    הוא עבד בחברת סטארט־אפ קטנה, כתב קוד נקי מדי, ותיקן באגים של אחרים בלי לעשות מזה עניין.
+                    בערב הוא סגר את הלפטופ, חייך אל המראה כאילו הוא סוגר טיקט אחרון, ויצא אל הרחוב.
+                </p>
+                <p>
+                    העיר נראתה אחרת אחרי חצות.
+                    פחות רעש, יותר צללים, ויותר אנשים שמאמינים שאף אחד לא מסתכל.
+                    יאיר דווקא הסתכל.
+                    הוא לא לבש גלימה ולא החזיק גאדג’טים נוצצים.
+                    במקום זה היה לו תיק גב פשוט, כפפות, פנס קטן, ולב אחד שמסרב להשלים עם זה שפשע הוא “בעיה של מישהו אחר”.
+                </p>
+                <p>
+                    הוא התחיל בקטן.
+                    פעם אחת ראה מישהו מנסה לפרוץ לאופניים ליד תחנת רכבת.
+                    יאיר לא צעק.
+                    הוא פשוט התקרב, הדליק את הפנס, ואמר בטון של code review: “אתה בטוח שזה הפתרון הכי טוב שמצאת?”
+                    הפורץ הסתובב, התבלבל לשנייה, ויאיר כבר עמד בינו לבין האופניים.
+                    לא הייתה אלימות — רק נוכחות.
+                    לפעמים זה כל מה שצריך.
+                </p>
+                <p>
+                    אבל הסיפור האמיתי התחיל כשהוא שם לב לדפוס.
+                    הודעות על פריצות קטנות בשכונה, כולן באותן שעות, כולן סביב אותם רחובות.
+                    יאיר, כמו יאיר, עשה מה שכל מתכנת עושה מול תעלומה: אסף נתונים.
+                    הוא לא “פרץ” לשום דבר — הוא פשוט חיפש עקבות.
+                    פוסטים בקבוצות שכונתיות, מצלמות ציבוריות שפרסמו תמונות מטושטשות, דיווחי מוקד עירוני.
+                    הוא בנה לעצמו מפה, סימן נקודות, וחיפש גרף שחוזר על עצמו.
+                </p>
+                <p>
+                    התוצאה הייתה ברורה מדי.
+                    מישהו עבד בשיטה.
+                    לא גנב אחד מזדמן, אלא צוות קטן שמנסה להיראות אקראי.
+                    והכי גרוע — הם לא חיפשו רק כסף.
+                    הם חיפשו הזדמנות.
+                    באחד הלילות יאיר הגיע לרחוב צדדי רגע לפני שהכול קרה.
+                    ראה ואן לבן בלי סימנים, מנוע פועל, ואדם שמדבר בטלפון כאילו הוא מחכה לאות.
+                    יאיר נשם עמוק.
+                    ואז עשה את הדבר שהכי הכיר: דיבאג.
+                </p>
+                <p>
+                    הוא עקף את המקום, שמר מרחק, והתקשר למוקד.
+                    לא “יש כאן פושעים” — זה לא עובד.
+                    הוא נתן פרטים: מיקום, רכב, מספר אנשים, כיוון תנועה אפשרי.
+                    בזמן שחיכה, הוא יצר הסחת דעת קטנה: הפיל פח מחזור, רחוק מספיק כדי למשוך מבט, קרוב מספיק כדי לשבור קצב.
+                    האנשים ליד הוואן זזו, התלבטו, ואז התחילו להתקפל.
+                    בדיוק אז נשמעו סירנות.
+                    יאיר לא נשאר לראות את הסוף.
+                    הוא לא חיפש מחיאות כפיים.
+                    הוא חיפש שקט.
+                </p>
+                <p>
+                    בבוקר, כשהגיע למשרד, אחד החברים לצוות התלונן על באג “מסתורי” בפרודקשן.
+                    יאיר התיישב, סידר את המקלדת, ואמר: “בואו נתחיל מהלוגים.”
+                    אף אחד לא ידע שבאותו לילה הוא כבר פתר בעיה אחרת לגמרי.
+                    בעיר יש באגים שלא מופיעים ב־CI.
+                    וליאיר הייתה שיטה: לא להתייאש, לא להילחץ, ולתקן — אחד אחד.
+                </p>
+                <p>
+                    עם הזמן הוא פיתח לעצמו כללי עבודה, כמו סטנדרטים לקוד.
+                    לא לגעת במה שלא שלו; לא להסתכן בשביל אגו; לא “להוכיח” שום דבר.
+                    אם יש ספק — מתקשרים, מתעדים, ומתרחקים.
+                    הוא ידע כמה קל להידרדר מהגנה על אנשים להצגה, וכמה קל לשכנע את עצמך שהמטרה מקדשת את האמצעים.
+                    לכן הוא שמר את הגיבורים שלו בסיפורים, ואת המציאות נקייה.
+                </p>
+                <p>
+                    לילה אחד, בדרכו הביתה, הוא שמע צעקה קצרה מחניון.
+                    כשהתקרב ראה נער לחוץ שמחזיק תיק, ומולו אדם מבוגר שמנסה למשוך אותו בכוח.
+                    יאיר עצר שני מטרים מהם, הרים יד פתוחה, ושאל: “הכול בסדר פה?”
+                    זה נשמע פשוט, כמעט טיפשי — אבל השאלה הזו שברה את הרגע.
+                    העיניים של שניהם פנו אליו, והמתח השתנה.
+                    יאיר לא התקרב עוד; הוא רק נשאר שם, יציב, עד שעברו עוד אנשים ברחוב.
+                    כשהמקום כבר לא היה מבודד, האיש שחרר, ממלמל משהו, ונעלם.
+                    הנער נשם, אמר תודה קצרה, והלך.
+                    יאיר המשיך הביתה, והבין שהדבר הכי “חזק” שיש לו הוא לא כוח, אלא בחירה להיות עד.
+                </p>
+            </div>
+        </section>
     </div>
+
+    <script>
+        (function () {
+            const tabs = Array.from(document.querySelectorAll('.tab'));
+            const panels = Array.from(document.querySelectorAll('.tab-panel'));
+
+            function setActive(id) {
+                tabs.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === id));
+                panels.forEach(p => p.classList.toggle('active', p.id === id));
+            }
+
+            tabs.forEach(btn => {
+                btn.addEventListener('click', () => setActive(btn.dataset.tab));
+            });
+        })();
+    </script>
 </body>
 </html>
