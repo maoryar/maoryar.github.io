@@ -100,6 +100,68 @@
             margin-bottom: 0;
         }
 
+        .choices {
+            text-align: right;
+            margin-top: 1rem;
+            padding: 1.2rem 1.1rem;
+            border-radius: 18px;
+            background: rgba(0, 0, 0, 0.22);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .choices img {
+            width: 100%;
+            max-width: 520px;
+            border-radius: 16px;
+            display: block;
+            margin: 0 auto 1rem auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .song-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .song-card {
+            padding: 1rem;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .song-card h3 {
+            margin: 0 0 0.35rem 0;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .song-card p {
+            margin: 0 0 0.75rem 0;
+            opacity: 0.95;
+            line-height: 1.7;
+        }
+
+        .video {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .video iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
         .main-text {
             font-size: 2.5rem;
             font-weight: 300;
@@ -224,6 +286,7 @@
         <nav class="tabs" aria-label="Site sections">
             <button class="tab active" type="button" data-tab="home">Home</button>
             <button class="tab" type="button" data-tab="stories">סיפורים קצרים</button>
+            <button class="tab" type="button" data-tab="choices">בחירות שירים</button>
         </nav>
 
         <section class="tab-panel active" id="home" role="tabpanel">
@@ -311,6 +374,71 @@
                     הנער נשם, אמר תודה קצרה, והלך.
                     יאיר המשיך הביתה, והבין שהדבר הכי “חזק” שיש לו הוא לא כוח, אלא בחירה להיות עד.
                 </p>
+            </div>
+        </section>
+
+        <section class="tab-panel" id="choices" role="tabpanel" dir="rtl" lang="he">
+            <h1 class="main-text">בחירות שירים</h1>
+            <div class="choices">
+                <img src="assets/images/song-choices.jpg" alt="בחירות שירים" loading="lazy" />
+
+                <div class="song-list">
+                    <div class="song-card">
+                        <h3>מיכל — Steve Wonder: “We can work it out”</h3>
+                        <p>קאבר פאנקי וכיפי עם מלא גרוב וליינים. שיר שמזמין אותנו לעשות אותו “שלנו” (כן, עם תוף מרים).</p>
+                        <div class="video">
+                            <iframe
+                                src="https://www.youtube.com/embed/MkF_u-_mm0Q"
+                                title="We can work it out"
+                                loading="lazy"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                            ></iframe>
+                        </div>
+                    </div>
+
+                    <div class="song-card">
+                        <h3>מיכל — Hair musical: “I got life”</h3>
+                        <p>המנון חופש ואנרגיה. כזה שמרים חיוך, עושה חשק לזוז, ונשמע מעולה בגרסה של הרכב.</p>
+                        <div class="video">
+                            <iframe
+                                src="https://www.youtube.com/embed/qlVmQDE1cWM"
+                                title="I got life"
+                                loading="lazy"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                            ></iframe>
+                        </div>
+                    </div>
+
+                    <div class="song-card">
+                        <h3>מיכל — ריטה: “רגע פרטי”</h3>
+                        <p>בלדת רוק ישראלית עם פוטנציאל לעיבוד “אוונסנס”-י: דרמה, כוח, וליין גיטרה שנשאר בראש.</p>
+                        <div class="video">
+                            <iframe
+                                src="https://www.youtube.com/embed/LY3baJOd9To"
+                                title="רגע פרטי"
+                                loading="lazy"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                            ></iframe>
+                        </div>
+                    </div>
+
+                    <div class="song-card">
+                        <h3>מיכל — Jackson 5: “I want you back”</h3>
+                        <p>קלאסיקה שמחה שאפשר להפוך לגמרי ולתת לה טוויסט של ההרכב — מוכר, מדבק, וקל לעבוד איתו על במה.</p>
+                        <div class="video">
+                            <iframe
+                                src="https://www.youtube.com/embed?listType=search&list=Jackson%205%20I%20Want%20You%20Back"
+                                title="I want you back"
+                                loading="lazy"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                            ></iframe>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
