@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>חוגזי | Choogzi</title>
+    <title>חוגזי | Choogzi - הופעה חיה</title>
     
-    <!-- Google Fonts: Heebo & Montserrat -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-color: #0b0c10;
-            --card-bg: #1f2833;
-            --accent-color: #e50914;
-            --accent-hover: #ff1e27;
-            --text-main: #ffffff;
-            --text-muted: #c5c6c7;
+            --bg-color: #0d0e12;
+            --card-bg: #16181f;
+            --accent-color: #e6683c;
+            --accent-hover: #ff7b4d;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
             --insta-grad: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            --glass-bg: rgba(22, 24, 31, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
         }
 
         * {
@@ -35,32 +37,32 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(220, 39, 67, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(188, 24, 136, 0.08) 0%, transparent 40%);
         }
 
-        /* Hero Section */
+        /* Header / Hero */
         header {
-            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(11,12,16,1) 100%), 
-                        radial-gradient(circle at center, rgba(229, 9, 20, 0.15) 0%, transparent 70%);
-            padding: 4rem 1.5rem 3rem;
+            padding: 4.5rem 1.5rem 3rem;
             text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
         }
 
-        .band-title {
-            font-family: 'Heebo', sans-serif;
-            font-size: 4rem;
+        .band-logo {
+            font-size: 4.5rem;
             font-weight: 900;
-            letter-spacing: -1px;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #ffffff 0%, #a5a5a5 100%);
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, #ffffff 30%, #9ca3af 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
         .band-subtitle {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             color: var(--text-muted);
             font-weight: 300;
             margin-bottom: 2rem;
@@ -76,70 +78,110 @@
             padding: 12px 28px;
             border-radius: 50px;
             font-weight: 700;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 20px rgba(220, 39, 67, 0.4);
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 25px rgba(220, 39, 67, 0.35);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .insta-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 30px rgba(220, 39, 67, 0.6);
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 35px rgba(220, 39, 67, 0.55);
         }
 
         .insta-btn svg {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             fill: currentColor;
         }
 
-        /* Gallery Section */
+        /* Controls / Filter Section */
+        .controls {
+            max-width: 1280px;
+            margin: 0 auto 2.5rem;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+        }
+
+        .filter-btn:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .filter-btn.active {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Main Container */
         main {
             flex: 1;
-            max-width: 1200px;
+            max-width: 1280px;
             width: 100%;
             margin: 0 auto;
-            padding: 3rem 1.5rem;
+            padding: 0 1.5rem 4rem;
         }
 
-        .section-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-        }
-
+        /* Bento Grid Gallery */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: 260px;
+            gap: 16px;
         }
 
         .gallery-item {
             position: relative;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
             background: var(--card-bg);
-            aspect-ratio: 4 / 3;
             cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        /* Bento spans for variety */
+        .gallery-item.featured {
+            grid-column: span 2;
+            grid-row: span 2;
+        }
+
+        .gallery-item.wide {
+            grid-column: span 2;
+            grid-row: span 1;
+        }
+
+        .gallery-item.tall {
+            grid-column: span 1;
+            grid-row: span 2;
         }
 
         .gallery-item:hover {
-            transform: translateY(-5px);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+            transform: translateY(-6px) scale(1.01);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            z-index: 2;
         }
 
         .gallery-item img {
@@ -147,98 +189,242 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            transition: transform 0.5s ease;
+            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
         .gallery-item:hover img {
-            transform: scale(1.05);
+            transform: scale(1.07);
         }
 
-        /* Placeholder state when no images are uploaded yet */
-        .placeholder-box {
+        /* Hover Overlay */
+        .item-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
+            opacity: 0;
             display: flex;
             flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item:hover .item-overlay {
+            opacity: 1;
+        }
+
+        .overlay-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+            transform: translateY(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .overlay-sub {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            transform: translateY(10px);
+            transition: transform 0.3s ease 0.05s;
+        }
+
+        .gallery-item:hover .overlay-title,
+        .gallery-item:hover .overlay-sub {
+            transform: translateY(0);
+        }
+
+        .zoom-icon {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 36px;
+            height: 36px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 50%;
+            display: flex;
             align-items: center;
             justify-content: center;
-            height: 100%;
-            padding: 20px;
-            text-align: center;
-            color: var(--text-muted);
-            border: 2px dashed rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.02);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.3s ease;
         }
 
-        .placeholder-box svg {
-            width: 48px;
-            height: 48px;
-            margin-bottom: 12px;
-            opacity: 0.4;
+        .gallery-item:hover .zoom-icon {
+            transform: scale(1);
+            opacity: 1;
         }
 
-        /* Lightbox Modal */
+        /* Lightbox Modal with Navigation */
         .lightbox {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.92);
+            inset: 0;
+            background: rgba(5, 6, 8, 0.95);
             z-index: 1000;
+            backdrop-filter: blur(15px);
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            backdrop-filter: blur(8px);
+            user-select: none;
         }
 
         .lightbox.active {
             display: flex;
+            animation: fadeIn 0.25s ease forwards;
         }
 
-        .lightbox img {
-            max-width: 90%;
-            max-height: 85vh;
-            border-radius: 8px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 82vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lightbox-img {
+            max-width: 100%;
+            max-height: 82vh;
+            border-radius: 12px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
             object-fit: contain;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .lightbox-close {
+        .lightbox-caption {
+            margin-top: 15px;
+            color: var(--text-muted);
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        /* Nav Controls */
+        .lb-btn {
             position: absolute;
-            top: 20px;
-            right: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             color: white;
-            font-size: 2.5rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            line-height: 1;
-            user-select: none;
-            transition: color 0.2s ease;
+            font-size: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+            z-index: 1010;
         }
 
-        .lightbox-close:hover {
-            color: var(--accent-color);
+        .lb-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.1);
+        }
+
+        .lb-close {
+            top: 25px;
+            left: 25px;
+        }
+
+        .lb-prev {
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .lb-next {
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .lb-prev:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .lb-next:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .lb-counter {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
         }
 
         /* Footer */
         footer {
             text-align: center;
-            padding: 2rem 1.5rem;
-            color: rgba(255, 255, 255, 0.4);
+            padding: 2.5rem 1.5rem;
+            color: var(--text-muted);
             font-size: 0.9rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.2);
         }
 
-        @media (max-width: 600px) {
-            .band-title {
-                font-size: 2.8rem;
-            }
-            header {
-                padding: 3rem 1rem 2rem;
-            }
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
             .gallery-grid {
-                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-                gap: 15px;
+                grid-template-columns: repeat(3, 1fr);
+                grid-auto-rows: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .band-logo {
+                font-size: 3.2rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-auto-rows: 220px;
+                gap: 12px;
+            }
+
+            .gallery-item.featured,
+            .gallery-item.wide,
+            .gallery-item.tall {
+                grid-column: span 1;
+                grid-row: span 1;
+            }
+
+            /* On mobile, allow the first highlight to span 2 cols */
+            .gallery-item.featured {
+                grid-column: span 2;
+                grid-row: span 2;
+            }
+
+            .lb-prev { right: 10px; }
+            .lb-next { left: 10px; }
+        }
+
+        @media (max-width: 480px) {
+            .band-logo {
+                font-size: 2.5rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                grid-auto-rows: 260px;
+            }
+
+            .gallery-item.featured {
+                grid-column: span 1;
+                grid-row: span 1;
             }
         }
     </style>
@@ -246,8 +432,8 @@
 <body>
 
     <header>
-        <h1 class="band-title">חוגזי</h1>
-        <p class="band-subtitle">תמונות מההופעה האחרונה ועדכונים</p>
+        <h1 class="band-logo">חוגזי</h1>
+        <p class="band-subtitle">תמונות מההופעה האחרונה • רגעים מהבמה</p>
         
         <a href="https://www.instagram.com/choogzi?igsh=MWs2Nnl0eXBmcjlxZg==" target="_blank" rel="noopener noreferrer" class="insta-btn">
             <svg viewBox="0 0 24 24">
@@ -257,92 +443,280 @@
         </a>
     </header>
 
+    <div class="controls">
+        <button class="filter-btn active" onclick="filterGallery('all')">הכל (19)</button>
+        <button class="filter-btn" onclick="filterGallery('band')">הלהקה בלייב</button>
+        <button class="filter-btn" onclick="filterGallery('solos')">סולואים וכלים</button>
+        <button class="filter-btn" onclick="filterGallery('bow')">סיום והקידה</button>
+    </div>
+
     <main>
-        <h2 class="section-title">גלריית תמונות מההופעה</h2>
         <div class="gallery-grid" id="gallery">
-            <!-- Photos will be dynamically rendered or placed here -->
+            <!-- Dynamic Bento Grid Items -->
         </div>
     </main>
 
-    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-        <span class="lightbox-close">&times;</span>
-        <img id="lightbox-img" src="" alt="תמונה מההופעה">
+    <!-- Lightbox Modal -->
+    <div class="lightbox" id="lightbox">
+        <button class="lb-btn lb-close" onclick="closeLightbox()">&times;</button>
+        <button class="lb-btn lb-prev" onclick="navigateLightbox(1)">&#10095;</button>
+        <button class="lb-btn lb-next" onclick="navigateLightbox(-1)">&#10094;</button>
+        
+        <div class="lb-counter" id="lb-counter">1 / 19</div>
+        
+        <div class="lightbox-content">
+            <img id="lb-img" class="lightbox-img" src="" alt="תמונה מגדלת">
+        </div>
+        <div class="lightbox-caption" id="lb-caption"></div>
     </div>
 
     <footer>
-        &copy; <span id="year"></span> חוגזי - כל הזכויות שמורות
+        &copy; <span id="year"></span> חוגזי • Choogzi - כל הזכויות שמורות
     </footer>
 
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
 
-        // List of image files inside the 'images' folder
-        // You can add image paths here, e.g. ['images/1.jpg', 'images/2.jpg']
-        const imageList = [
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-1.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-2.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-3.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-4.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-5.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-6.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-7.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-8.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-9.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-10.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-11.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-12.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-13.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-14.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-15.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-16.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-17.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-18.jpg',
-            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-19.jpg'
+        // Structured Gallery Items
+        const galleryData = [
+            {
+                id: 8,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-8.jpg',
+                title: 'חוגזי בלייב',
+                sub: 'הלהקה בהרכב מלא תחת תאורה כחולה',
+                category: 'band',
+                layout: 'featured'
+            },
+            {
+                id: 14,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-14.jpg',
+                title: 'סולו סקסופון',
+                sub: 'תאורה צבעונית ואנרגיה על הבמה',
+                category: 'solos',
+                layout: 'tall'
+            },
+            {
+                id: 7,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-7.jpg',
+                title: 'תודה לקהל',
+                sub: 'חיבוק קבוצתי של חברי הלהקה בסיום',
+                category: 'bow',
+                layout: 'wide'
+            },
+            {
+                id: 5,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-5.jpg',
+                title: 'הפדאלבורד',
+                sub: 'ציוד הגיטרות על הבמה',
+                category: 'solos',
+                layout: 'standard'
+            },
+            {
+                id: 11,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-11.jpg',
+                title: 'אורות הבמה',
+                sub: 'חוגזי בביצוע אנרגטי',
+                category: 'band',
+                layout: 'wide'
+            },
+            {
+                id: 1,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-1.jpg',
+                title: 'גיטרה ושירה',
+                sub: 'תאורת מאג׳נטה דרמטית',
+                category: 'solos',
+                layout: 'standard'
+            },
+            {
+                id: 15,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-15.jpg',
+                title: 'סקסופון מקרוב',
+                sub: 'רגעי הסולו הסוחפים',
+                category: 'solos',
+                layout: 'tall'
+            },
+            {
+                id: 9,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-9.jpg',
+                title: 'הקידה המסורתית',
+                sub: 'מודים לקהל בסוף ההופעה',
+                category: 'bow',
+                layout: 'wide'
+            },
+            {
+                id: 2,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-2.jpg',
+                title: 'מערכת התופים',
+                sub: 'Tama Drums בתאורת אדומה',
+                category: 'solos',
+                layout: 'standard'
+            },
+            {
+                id: 12,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-12.jpg',
+                title: 'ביצוע מרשים',
+                sub: 'שירה ועוצמה על הבמה',
+                category: 'band',
+                layout: 'standard'
+            },
+            {
+                id: 18,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-18.jpg',
+                title: 'גיטרת בס',
+                sub: 'Fender Jazz Bass מקרוב',
+                category: 'solos',
+                layout: 'tall'
+            },
+            {
+                id: 3,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-3.jpg',
+                title: 'מבט מהאולם',
+                sub: 'הבמה והקהל בשולחנות',
+                category: 'band',
+                layout: 'wide'
+            },
+            {
+                id: 16,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-16.jpg',
+                title: 'דואט שירה ובס',
+                sub: 'רגע קסום במהלך ההופעה',
+                category: 'band',
+                layout: 'standard'
+            },
+            {
+                id: 4,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-4.jpg',
+                title: 'מבט מהתופים',
+                sub: 'זווית המתופף אל הקהל',
+                category: 'solos',
+                layout: 'standard'
+            },
+            {
+                id: 13,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-13.jpg',
+                title: 'הזמרת במרכז',
+                sub: 'תאורת סגול עמוקה',
+                category: 'band',
+                layout: 'standard'
+            },
+            {
+                id: 17,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-17.jpg',
+                title: 'סולו סקסופון חזיתי',
+                sub: 'צליל ייחודי ועשיר',
+                category: 'solos',
+                layout: 'standard'
+            },
+            {
+                id: 6,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-6.jpg',
+                title: 'מיקרופון קדמי',
+                sub: 'פוקוס על הבמה והקהל ברקע',
+                category: 'solos',
+                layout: 'standard'
+            },
+            {
+                id: 10,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-10.jpg',
+                title: 'שיחה על הבמה',
+                sub: 'מדברים עם הקהל בין השירים',
+                category: 'band',
+                layout: 'standard'
+            },
+            {
+                id: 19,
+                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-19.jpg',
+                title: 'סקסופון כהה',
+                sub: 'תקריב של הכלי המבריק',
+                category: 'solos',
+                layout: 'standard'
+            }
         ];
+
+        let currentFiltered = [...galleryData];
+        let currentIndex = 0;
 
         const gallery = document.getElementById('gallery');
 
-        function renderGallery() {
+        function renderGallery(filter = 'all') {
             gallery.innerHTML = '';
             
-            if (imageList.length === 0) {
-                // Show placeholder state until photos are uploaded
-                gallery.innerHTML = `
-                    <div class="gallery-item" style="grid-column: 1 / -1;">
-                        <div class="placeholder-box">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                                <circle cx="8.5" cy="8.5" r="1.5"/>
-                                <polyline points="21 15 16 10 5 21"/>
-                            </svg>
-                            <p style="font-size: 1.1rem; font-weight: 500; margin-bottom: 6px;">התמונות מההופעה יעלו לכאן בקרוב!</p>
-                            <p style="font-size: 0.9rem; opacity: 0.7;">העלה את קבצי התמונות לתיקיית images ברפוזיטורי</p>
-                        </div>
-                    </div>
-                `;
-                return;
+            if (filter === 'all') {
+                currentFiltered = [...galleryData];
+            } else {
+                currentFiltered = galleryData.filter(item => item.category === filter);
             }
 
-            imageList.forEach((src, index) => {
-                const item = document.createElement('div');
-                item.className = 'gallery-item';
-                item.onclick = () => openLightbox(src);
-                item.innerHTML = `<img src="${src}" alt="חוגזי בהופעה ${index + 1}" loading="lazy">`;
-                gallery.appendChild(item);
+            currentFiltered.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = `gallery-item ${item.layout || 'standard'}`;
+                card.onclick = () => openLightbox(index);
+                
+                card.innerHTML = `
+                    <img src="${item.src}" alt="${item.title}" loading="lazy">
+                    <div class="zoom-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            <line x1="11" y1="8" x2="11" y2="14"/>
+                            <line x1="8" y1="11" x2="14" y2="11"/>
+                        </svg>
+                    </div>
+                    <div class="item-overlay">
+                        <div class="overlay-title">${item.title}</div>
+                        <div class="overlay-sub">${item.sub}</div>
+                    </div>
+                `;
+                gallery.appendChild(card);
             });
         }
 
-        function openLightbox(src) {
-            const lightbox = document.getElementById('lightbox');
-            const img = document.getElementById('lightbox-img');
-            img.src = src;
-            lightbox.classList.add('active');
+        function filterGallery(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderGallery(category);
+        }
+
+        /* Lightbox Functions */
+        function openLightbox(index) {
+            currentIndex = index;
+            updateLightbox();
+            const lb = document.getElementById('lightbox');
+            lb.classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeLightbox() {
-            document.getElementById('lightbox').classList.remove('active');
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('active');
+            document.body.style.overflow = '';
         }
 
+        function navigateLightbox(direction) {
+            currentIndex += direction;
+            if (currentIndex < 0) currentIndex = currentFiltered.length - 1;
+            if (currentIndex >= currentFiltered.length) currentIndex = 0;
+            updateLightbox();
+        }
+
+        function updateLightbox() {
+            const item = currentFiltered[currentIndex];
+            document.getElementById('lb-img').src = item.src;
+            document.getElementById('lb-caption').textContent = `${item.title} — ${item.sub}`;
+            document.getElementById('lb-counter').textContent = `${currentIndex + 1} / ${currentFiltered.length}`;
+        }
+
+        /* Keyboard Shortcuts */
+        document.addEventListener('keydown', (e) => {
+            const lb = document.getElementById('lightbox');
+            if (!lb.classList.contains('active')) return;
+            
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') navigateLightbox(-1);
+            if (e.key === 'ArrowRight') navigateLightbox(1);
+        });
+
+        // Initialize Gallery
         renderGallery();
     </script>
 </body>
