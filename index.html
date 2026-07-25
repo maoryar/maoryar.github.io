@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>חוגזי | Choogzi - הופעה חיה</title>
+    <title>חוגזי | Choogzi - הופעות חיות וגלרייה</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -68,6 +68,14 @@
             margin-bottom: 2rem;
         }
 
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
         .insta-btn {
             display: inline-flex;
             align-items: center;
@@ -75,10 +83,10 @@
             background: var(--insta-grad);
             color: #ffffff;
             text-decoration: none;
-            padding: 12px 28px;
+            padding: 12px 26px;
             border-radius: 50px;
             font-weight: 700;
-            font-size: 1.05rem;
+            font-size: 1rem;
             box-shadow: 0 4px 25px rgba(220, 39, 67, 0.35);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -88,49 +96,31 @@
             box-shadow: 0 8px 35px rgba(220, 39, 67, 0.55);
         }
 
-        .insta-btn svg {
+        .yt-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #FF0000;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 12px 26px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 4px 25px rgba(255, 0, 0, 0.35);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .yt-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 35px rgba(255, 0, 0, 0.55);
+            background: #e60000;
+        }
+
+        .insta-btn svg, .yt-btn svg, .yt-playlist-btn svg {
             width: 22px;
             height: 22px;
             fill: currentColor;
-        }
-
-        /* Controls / Filter Section */
-        .controls {
-            max-width: 1280px;
-            margin: 0 auto 2.5rem;
-            padding: 0 1.5rem;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .filter-btn {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-muted);
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-family: inherit;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            transition: all 0.25s ease;
-        }
-
-        .filter-btn:hover {
-            color: #fff;
-            border-color: rgba(255, 255, 255, 0.25);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .filter-btn.active {
-            background: #ffffff;
-            color: #000000;
-            border-color: #ffffff;
-            font-weight: 700;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
         }
 
         /* Main Container */
@@ -142,12 +132,29 @@
             padding: 0 1.5rem 4rem;
         }
 
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
         /* Bento Grid Gallery */
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-auto-rows: 260px;
             gap: 16px;
+            margin-bottom: 4rem;
         }
 
         .gallery-item {
@@ -161,7 +168,6 @@
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        /* Bento spans for variety */
         .gallery-item.featured {
             grid-column: span 2;
             grid-row: span 2;
@@ -196,44 +202,6 @@
             transform: scale(1.07);
         }
 
-        /* Hover Overlay */
-        .item-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
-            opacity: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 20px;
-            transition: opacity 0.3s ease;
-        }
-
-        .gallery-item:hover .item-overlay {
-            opacity: 1;
-        }
-
-        .overlay-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 4px;
-            transform: translateY(10px);
-            transition: transform 0.3s ease;
-        }
-
-        .overlay-sub {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            transform: translateY(10px);
-            transition: transform 0.3s ease 0.05s;
-        }
-
-        .gallery-item:hover .overlay-title,
-        .gallery-item:hover .overlay-sub {
-            transform: translateY(0);
-        }
-
         .zoom-icon {
             position: absolute;
             top: 15px;
@@ -258,7 +226,58 @@
             opacity: 1;
         }
 
-        /* Lightbox Modal with Navigation */
+        /* Video Section */
+        .video-section {
+            margin-top: 2rem;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border);
+            background: #000;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .more-videos {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .yt-playlist-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 12px 24px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.25s ease;
+        }
+
+        .yt-playlist-btn:hover {
+            color: #fff;
+            background: rgba(255,0,0,0.2);
+            border-color: rgba(255,0,0,0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Lightbox Modal */
         .lightbox {
             display: none;
             position: fixed;
@@ -286,7 +305,7 @@
         .lightbox-content {
             position: relative;
             max-width: 90vw;
-            max-height: 82vh;
+            max-height: 85vh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -294,21 +313,13 @@
 
         .lightbox-img {
             max-width: 100%;
-            max-height: 82vh;
+            max-height: 85vh;
             border-radius: 12px;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
             object-fit: contain;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .lightbox-caption {
-            margin-top: 15px;
-            color: var(--text-muted);
-            font-size: 1rem;
-            text-align: center;
-        }
-
-        /* Nav Controls */
         .lb-btn {
             position: absolute;
             background: rgba(255, 255, 255, 0.1);
@@ -376,7 +387,7 @@
             background: rgba(0, 0, 0, 0.2);
         }
 
-        /* Responsive Breakpoints */
+        /* Responsive */
         @media (max-width: 1024px) {
             .gallery-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -402,7 +413,6 @@
                 grid-row: span 1;
             }
 
-            /* On mobile, allow the first highlight to span 2 cols */
             .gallery-item.featured {
                 grid-column: span 2;
                 grid-row: span 2;
@@ -435,18 +445,46 @@
         <h1 class="band-logo">חוגזי</h1>
         <p class="band-subtitle">תמונות מההופעה האחרונה • רגעים מהבמה</p>
         
-        <a href="https://www.instagram.com/choogzi?igsh=MWs2Nnl0eXBmcjlxZg==" target="_blank" rel="noopener noreferrer" class="insta-btn">
-            <svg viewBox="0 0 24 24">
-                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-            </svg>
-            עקבו אחרינו באינסטגרם
-        </a>
+        <div class="social-buttons">
+            <a href="https://www.instagram.com/choogzi?igsh=MWs2Nnl0eXBmcjlxZg==" target="_blank" rel="noopener noreferrer" class="insta-btn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+                אינסטגרם
+            </a>
+
+            <a href="https://youtube.com/playlist?list=PLPj09wFJNFpYgmu6w5YVlObxvA_Ni5OAb&si=axqIDgFxTZqVbGwa" target="_blank" rel="noopener noreferrer" class="yt-btn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 0 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+                ערוץ ה-YouTube
+            </a>
+        </div>
     </header>
 
     <main>
         <div class="gallery-grid" id="gallery">
             <!-- Dynamic Bento Grid Items -->
         </div>
+
+        <section class="video-section">
+            <h2 class="section-title">הופעות קודמות</h2>
+            <div class="video-container">
+                <iframe 
+                    src="https://www.youtube.com/embed/y6Sfx8qN6NE" 
+                    title="חוגזי - הופעה חיה" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <div class="more-videos">
+                <a href="https://youtube.com/playlist?list=PLPj09wFJNFpYgmu6w5YVlObxvA_Ni5OAb&si=axqIDgFxTZqVbGwa" target="_blank" rel="noopener noreferrer" class="yt-playlist-btn">
+                    <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 0 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    לצפייה בכל סרטוני ההופעות בפלייליסט ב-YouTube
+                </a>
+            </div>
+        </section>
     </main>
 
     <!-- Lightbox Modal -->
@@ -471,158 +509,25 @@
 
         // Structured Gallery Items
         const galleryData = [
-            {
-                id: 8,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-8.jpg',
-                title: 'חוגזי בלייב',
-                sub: 'הלהקה בהרכב מלא תחת תאורה כחולה',
-                category: 'band',
-                layout: 'featured'
-            },
-            {
-                id: 14,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-14.jpg',
-                title: 'סולו סקסופון',
-                sub: 'תאורה צבעונית ואנרגיה על הבמה',
-                category: 'solos',
-                layout: 'tall'
-            },
-            {
-                id: 7,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-7.jpg',
-                title: 'תודה לקהל',
-                sub: 'חיבוק קבוצתי של חברי הלהקה בסיום',
-                category: 'bow',
-                layout: 'wide'
-            },
-            {
-                id: 5,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-5.jpg',
-                title: 'הפדאלבורד',
-                sub: 'ציוד הגיטרות על הבמה',
-                category: 'solos',
-                layout: 'standard'
-            },
-            {
-                id: 11,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-11.jpg',
-                title: 'אורות הבמה',
-                sub: 'חוגזי בביצוע אנרגטי',
-                category: 'band',
-                layout: 'wide'
-            },
-            {
-                id: 1,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-1.jpg',
-                title: 'גיטרה ושירה',
-                sub: 'תאורת מאג׳נטה דרמטית',
-                category: 'solos',
-                layout: 'standard'
-            },
-            {
-                id: 15,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-15.jpg',
-                title: 'סקסופון מקרוב',
-                sub: 'רגעי הסולו הסוחפים',
-                category: 'solos',
-                layout: 'tall'
-            },
-            {
-                id: 9,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-9.jpg',
-                title: 'הקידה המסורתית',
-                sub: 'מודים לקהל בסוף ההופעה',
-                category: 'bow',
-                layout: 'wide'
-            },
-            {
-                id: 2,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-2.jpg',
-                title: 'מערכת התופים',
-                sub: 'Tama Drums בתאורת אדומה',
-                category: 'solos',
-                layout: 'standard'
-            },
-            {
-                id: 12,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-12.jpg',
-                title: 'ביצוע מרשים',
-                sub: 'שירה ועוצמה על הבמה',
-                category: 'band',
-                layout: 'standard'
-            },
-            {
-                id: 18,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-18.jpg',
-                title: 'גיטרת בס',
-                sub: 'Fender Jazz Bass מקרוב',
-                category: 'solos',
-                layout: 'tall'
-            },
-            {
-                id: 3,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-3.jpg',
-                title: 'מבט מהאולם',
-                sub: 'הבמה והקהל בשולחנות',
-                category: 'band',
-                layout: 'wide'
-            },
-            {
-                id: 16,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-16.jpg',
-                title: 'דואט שירה ובס',
-                sub: 'רגע קסום במהלך ההופעה',
-                category: 'band',
-                layout: 'standard'
-            },
-            {
-                id: 4,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-4.jpg',
-                title: 'מבט מהתופים',
-                sub: 'זווית המתופף אל הקהל',
-                category: 'solos',
-                layout: 'standard'
-            },
-            {
-                id: 13,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-13.jpg',
-                title: 'הזמרת במרכז',
-                sub: 'תאורת סגול עמוקה',
-                category: 'band',
-                layout: 'standard'
-            },
-            {
-                id: 17,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-17.jpg',
-                title: 'סולו סקסופון חזיתי',
-                sub: 'צליל ייחודי ועשיר',
-                category: 'solos',
-                layout: 'standard'
-            },
-            {
-                id: 6,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-6.jpg',
-                title: 'מיקרופון קדמי',
-                sub: 'פוקוס על הבמה והקהל ברקע',
-                category: 'solos',
-                layout: 'standard'
-            },
-            {
-                id: 10,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-10.jpg',
-                title: 'שיחה על הבמה',
-                sub: 'מדברים עם הקהל בין השירים',
-                category: 'band',
-                layout: 'standard'
-            },
-            {
-                id: 19,
-                src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-19.jpg',
-                title: 'סקסופון כהה',
-                sub: 'תקריב של הכלי המבריק',
-                category: 'solos',
-                layout: 'standard'
-            }
+            { id: 8, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-8.jpg', layout: 'featured' },
+            { id: 14, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-14.jpg', layout: 'tall' },
+            { id: 7, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-7.jpg', layout: 'wide' },
+            { id: 5, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-5.jpg', layout: 'standard' },
+            { id: 11, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-11.jpg', layout: 'wide' },
+            { id: 1, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-1.jpg', layout: 'standard' },
+            { id: 15, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-15.jpg', layout: 'tall' },
+            { id: 9, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-9.jpg', layout: 'wide' },
+            { id: 2, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-2.jpg', layout: 'standard' },
+            { id: 12, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-12.jpg', layout: 'standard' },
+            { id: 18, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-18.jpg', layout: 'tall' },
+            { id: 3, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-3.jpg', layout: 'wide' },
+            { id: 16, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-16.jpg', layout: 'standard' },
+            { id: 4, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-4.jpg', layout: 'standard' },
+            { id: 13, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-13.jpg', layout: 'standard' },
+            { id: 17, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-17.jpg', layout: 'standard' },
+            { id: 6, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-6.jpg', layout: 'standard' },
+            { id: 10, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-10.jpg', layout: 'standard' },
+            { id: 19, src: 'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-19.jpg', layout: 'standard' }
         ];
 
         let currentIndex = 0;
