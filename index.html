@@ -443,13 +443,6 @@
         </a>
     </header>
 
-    <div class="controls">
-        <button class="filter-btn active" onclick="filterGallery('all')">הכל (19)</button>
-        <button class="filter-btn" onclick="filterGallery('band')">הלהקה בלייב</button>
-        <button class="filter-btn" onclick="filterGallery('solos')">סולואים וכלים</button>
-        <button class="filter-btn" onclick="filterGallery('bow')">סיום והקידה</button>
-    </div>
-
     <main>
         <div class="gallery-grid" id="gallery">
             <!-- Dynamic Bento Grid Items -->
@@ -633,21 +626,13 @@
             }
         ];
 
-        let currentFiltered = [...galleryData];
         let currentIndex = 0;
-
         const gallery = document.getElementById('gallery');
 
-        function renderGallery(filter = 'all') {
+        function renderGallery() {
             gallery.innerHTML = '';
             
-            if (filter === 'all') {
-                currentFiltered = [...galleryData];
-            } else {
-                currentFiltered = galleryData.filter(item => item.category === filter);
-            }
-
-            currentFiltered.forEach((item, index) => {
+            galleryData.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = `gallery-item ${item.layout || 'standard'}`;
                 card.onclick = () => openLightbox(index);
@@ -671,12 +656,6 @@
             });
         }
 
-        function filterGallery(category) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            renderGallery(category);
-        }
-
         /* Lightbox Functions */
         function openLightbox(index) {
             currentIndex = index;
@@ -694,16 +673,16 @@
 
         function navigateLightbox(direction) {
             currentIndex += direction;
-            if (currentIndex < 0) currentIndex = currentFiltered.length - 1;
-            if (currentIndex >= currentFiltered.length) currentIndex = 0;
+            if (currentIndex < 0) currentIndex = galleryData.length - 1;
+            if (currentIndex >= galleryData.length) currentIndex = 0;
             updateLightbox();
         }
 
         function updateLightbox() {
-            const item = currentFiltered[currentIndex];
+            const item = galleryData[currentIndex];
             document.getElementById('lb-img').src = item.src;
             document.getElementById('lb-caption').textContent = `${item.title} — ${item.sub}`;
-            document.getElementById('lb-counter').textContent = `${currentIndex + 1} / ${currentFiltered.length}`;
+            document.getElementById('lb-counter').textContent = `${currentIndex + 1} / ${galleryData.length}`;
         }
 
         /* Keyboard Shortcuts */
