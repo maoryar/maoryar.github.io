@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>חוגזי | Choogzi - סטליסט</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0d0e12;
+            --card-bg: #16181f;
+            --accent-color: #e6683c;
+            --accent-hover: #ff7b4d;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --glass-bg: rgba(22, 24, 31, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --player-h: 68px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 15% 20%, rgba(220, 39, 67, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(188, 24, 136, 0.08) 0%, transparent 40%);
+            /* room for the sticky player */
+            padding-bottom: calc(var(--player-h) + 10px);
+        }
+
+        /* Compact header — deliberately smaller than the home page hero so more
+           songs fit above the fold on mobile. */
+        header {
+            padding: 1.6rem 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .band-logo {
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #ffffff 30%, #9ca3af 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .band-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            margin-top: 0.2rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 0.8rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 6px 16px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            transition: all 0.25s ease;
+        }
+
+        .back-link:hover { color: #fff; background: rgba(255, 255, 255, 0.12); }
+
+        main {
+            flex: 1;
+            max-width: 860px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem 2rem;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .play-all-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.98rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(230, 104, 60, 0.3);
+            transition: all 0.25s ease;
+        }
+
+        .play-all-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            border-radius: 50px;
+            padding: 9px 16px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.14); }
+
+        /* Repeat button lights up when a mode is active */
+        .icon-btn.repeat-on {
+            color: var(--accent-hover);
+            border-color: rgba(230, 104, 60, 0.5);
+            background: rgba(230, 104, 60, 0.12);
+        }
+
+        .repeat-badge {
+            font-size: 0.72rem;
+            font-weight: 800;
+            min-width: 1ch;
+        }
+
+        .count { color: var(--text-muted); font-size: 0.88rem; margin-inline-start: auto; }
+
+        /* ---------- Song list ---------- */
+        .song-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+
+        .song {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 7px 10px 4px;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .song:hover { border-color: rgba(255, 255, 255, 0.18); }
+
+        .song.active {
+            border-color: rgba(230, 104, 60, 0.55);
+            background: linear-gradient(90deg, rgba(230, 104, 60, 0.1), var(--card-bg) 60%);
+        }
+
+        .song-row { display: flex; align-items: center; gap: 9px; }
+
+        .track-num {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            width: 1.4rem;
+            text-align: center;
+            flex: 0 0 auto;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .song.active .track-num { color: var(--accent-hover); }
+
+        .play-btn {
+            flex: 0 0 auto;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.07);
+            color: var(--text-main);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .play-btn:hover { background: var(--accent-color); border-color: var(--accent-color); }
+        .song.active .play-btn { background: var(--accent-color); border-color: var(--accent-color); }
+        .play-btn svg { width: 15px; height: 15px; fill: currentColor; }
+
+        .song-title {
+            flex: 1 1 auto;
+            font-size: 1rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+
+        .song-actions { display: flex; align-items: center; gap: 5px; flex: 0 0 auto; }
+
+        .chip {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            border-radius: 20px;
+            height: 28px;
+            padding: 0 10px;
+            font-family: inherit;
+            font-size: 0.78rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .chip:hover { color: #fff; background: rgba(255, 255, 255, 0.15); }
+        .chip svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; }
+        .chip.square { padding: 0; width: 28px; justify-content: center; }
+        .chip.bpm:hover { color: var(--accent-hover); border-color: rgba(230, 104, 60, 0.5); }
+        .chip[aria-busy="true"] { opacity: 0.5; pointer-events: none; }
+
+        /* ---------- Seek bar ----------
+           direction:ltr on purpose: audio time reads left-to-right even in an
+           RTL page, matching how YouTube/Spotify behave in Hebrew locales. */
+        .seek-wrap { direction: ltr; padding: 2px 2px 0; }
+
+        input[type="range"].seek {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 12px;
+            background: transparent;
+            cursor: pointer;
+            display: block;
+        }
+
+        input[type="range"].seek::-webkit-slider-runnable-track {
+            height: 3px;
+            border-radius: 3px;
+            background: linear-gradient(
+                to right,
+                var(--accent-color) 0%, var(--accent-color) var(--pct, 0%),
+                rgba(255, 255, 255, 0.12) var(--pct, 0%), rgba(255, 255, 255, 0.12) 100%);
+        }
+
+        input[type="range"].seek::-moz-range-track {
+            height: 3px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        input[type="range"].seek::-moz-range-progress {
+            height: 3px;
+            border-radius: 3px;
+            background: var(--accent-color);
+        }
+
+        input[type="range"].seek::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: #fff;
+            margin-top: -4px;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        input[type="range"].seek::-moz-range-thumb {
+            width: 11px; height: 11px; border: none; border-radius: 50%;
+            background: #fff; opacity: 0;
+        }
+
+        .song:hover input[type="range"].seek::-webkit-slider-thumb,
+        .song.active input[type="range"].seek::-webkit-slider-thumb { opacity: 1; }
+        .song:hover input[type="range"].seek::-moz-range-thumb,
+        .song.active input[type="range"].seek::-moz-range-thumb { opacity: 1; }
+
+        /* ---------- Sticky mini player ---------- */
+        .player {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: var(--player-h);
+            background: var(--glass-bg);
+            backdrop-filter: blur(14px);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 14px;
+            z-index: 900;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .player.visible { transform: translateY(0); }
+
+        .player-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            border-radius: 50%;
+            flex: 0 0 auto;
+            transition: all 0.2s ease;
+        }
+
+        .player-btn:hover { background: rgba(255, 255, 255, 0.12); }
+        .player-btn svg { width: 20px; height: 20px; fill: currentColor; }
+        .player-btn.main svg { width: 26px; height: 26px; }
+
+        .player-info { flex: 1 1 auto; min-width: 0; }
+
+        .player-title {
+            font-size: 0.92rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-time {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+            direction: ltr;
+            text-align: start;
+        }
+
+        /* ---------- Modals ---------- */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 6, 8, 0.94);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active { display: flex; animation: fadeIn 0.25s ease forwards; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .modal-close {
+            position: absolute;
+            top: 20px; left: 20px;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1010;
+        }
+
+        .modal-close:hover { background: rgba(255, 255, 255, 0.25); }
+
+        /* BPM visualizer */
+        .bpm-box { text-align: center; user-select: none; }
+
+        .bpm-song { color: var(--text-muted); font-size: 1rem; margin-bottom: 0.3rem; }
+        .bpm-value { font-size: 3.4rem; font-weight: 900; line-height: 1; }
+        .bpm-unit { font-size: 1rem; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 1.8rem; }
+
+        .pulse-stage {
+            position: relative;
+            width: 180px; height: 180px;
+            margin: 0 auto 1.6rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .pulse-core {
+            width: 96px; height: 96px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            box-shadow: 0 0 50px rgba(230, 104, 60, 0.5);
+            transform: scale(0.82);
+            transition: transform 90ms ease-out;
+        }
+
+        .pulse-core.hit { transform: scale(1.12); }
+
+        .pulse-ring {
+            position: absolute;
+            inset: 0;
+            border: 2px solid var(--accent-hover);
+            border-radius: 50%;
+            opacity: 0;
+        }
+
+        .pulse-ring.hit { animation: ringOut 0.6s ease-out; }
+
+        @keyframes ringOut {
+            from { opacity: 0.7; transform: scale(0.55); }
+            to   { opacity: 0;   transform: scale(1.1); }
+        }
+
+        .beat-dots { display: flex; justify-content: center; gap: 14px; }
+
+        .beat-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.18);
+            transition: background 0.08s ease, transform 0.08s ease;
+        }
+
+        .beat-dot.on { background: var(--accent-hover); transform: scale(1.45); }
+        .beat-dot.downbeat.on { background: #fff; }
+
+        .bpm-hint { color: var(--text-muted); font-size: 0.85rem; margin-top: 1.4rem; }
+
+        /* Chart (PDF) modal */
+        .chart-frame-wrap {
+            width: min(94vw, 900px);
+            height: 86vh;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-frame-wrap iframe { flex: 1; width: 100%; border: none; }
+
+        .chart-fallback {
+            padding: 10px;
+            text-align: center;
+            background: var(--card-bg);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .chart-fallback a { color: var(--accent-hover); font-size: 0.9rem; }
+
+        /* States */
+        .state-msg { text-align: center; color: var(--text-muted); padding: 3rem 1rem; }
+        .state-msg.error { color: #f87171; }
+
+        footer {
+            text-align: center;
+            padding: 1.6rem 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .sr-only {
+            position: absolute; width: 1px; height: 1px;
+            padding: 0; margin: -1px; overflow: hidden;
+            clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+        }
+
+        @media (max-width: 560px) {
+            .band-logo { font-size: 1.8rem; }
+            .band-subtitle { font-size: 0.85rem; }
+            main { padding: 0 0.7rem 1.5rem; }
+            .song { padding: 6px 8px 3px; border-radius: 9px; }
+            .song-row { gap: 7px; }
+            .song-title { font-size: 0.93rem; }
+            .play-btn { width: 31px; height: 31px; }
+            .track-num { width: 1.1rem; font-size: 0.74rem; }
+            .chip { height: 26px; font-size: 0.72rem; padding: 0 8px; }
+            .chip.square { width: 26px; padding: 0; }
+            .play-all-btn { padding: 9px 18px; font-size: 0.9rem; }
+            .icon-btn { padding: 8px 13px; font-size: 0.82rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 class="band-logo">חוגזי</h1>
+        <p class="band-subtitle">סטליסט • הקלטות, אקורדים וקצב</p>
+        <a href="index.html" class="back-link">&#8594; חזרה לעמוד הראשי</a>
+    </header>
+
+    <main>
+        <div class="toolbar">
+            <button class="play-all-btn" id="play-all">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                נגן את כל הסט
+            </button>
+
+            <button class="icon-btn" id="repeat-btn" aria-pressed="false">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 1 21 5 17 9"/>
+                    <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                    <polyline points="7 23 3 19 7 15"/>
+                    <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                </svg>
+                <span id="repeat-label">ללא חזרה</span>
+                <span class="repeat-badge" id="repeat-badge"></span>
+            </button>
+
+            <span class="count" id="count"></span>
+        </div>
+
+        <ul class="song-list" id="song-list"></ul>
+        <div class="state-msg" id="state">טוען את הסטליסט…</div>
+    </main>
+
+    <!-- Sticky mini player -->
+    <div class="player" id="player">
+        <button class="player-btn" id="p-prev" title="השיר הקודם" aria-label="השיר הקודם">
+            <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+        </button>
+        <button class="player-btn main" id="p-toggle" title="נגן / השהה" aria-label="נגן או השהה">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <button class="player-btn" id="p-next" title="השיר הבא" aria-label="השיר הבא">
+            <svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg>
+        </button>
+        <div class="player-info">
+            <div class="player-title" id="p-title">—</div>
+            <div class="player-time" id="p-time">0:00 / 0:00</div>
+        </div>
+    </div>
+
+    <!-- BPM visualizer -->
+    <div class="modal" id="bpm-modal" role="dialog" aria-modal="true" aria-labelledby="bpm-song">
+        <button class="modal-close" id="bpm-close" aria-label="סגור">&times;</button>
+        <div class="bpm-box">
+            <div class="bpm-song" id="bpm-song"></div>
+            <div class="bpm-value" id="bpm-value">60</div>
+            <div class="bpm-unit">BPM</div>
+            <div class="pulse-stage">
+                <div class="pulse-ring" id="pulse-ring"></div>
+                <div class="pulse-core" id="pulse-core"></div>
+            </div>
+            <div class="beat-dots" id="beat-dots"></div>
+            <p class="bpm-hint">ויזואליזציה של הקצב • 4/4</p>
+        </div>
+    </div>
+
+    <!-- Chart (PDF) viewer -->
+    <div class="modal" id="chart-modal" role="dialog" aria-modal="true" aria-label="אקורדים">
+        <button class="modal-close" id="chart-close" aria-label="סגור">&times;</button>
+        <div class="chart-frame-wrap">
+            <iframe id="chart-frame" title="אקורדים"></iframe>
+            <div class="chart-fallback">
+                <a id="chart-open" href="#" target="_blank" rel="noopener noreferrer">לא נטען? פתח את ה-PDF בלשונית חדשה</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; <span id="year"></span> חוגזי • Choogzi - כל הזכויות שמורות
+    </footer>
+
+    <audio id="audio" preload="none"></audio>
+
+    <script>
+    (function () {
+        'use strict';
+
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        var audio      = document.getElementById('audio');
+        var listEl     = document.getElementById('song-list');
+        var stateEl    = document.getElementById('state');
+        var countEl    = document.getElementById('count');
+        var player     = document.getElementById('player');
+        var pTitle     = document.getElementById('p-title');
+        var pTime      = document.getElementById('p-time');
+        var pToggle    = document.getElementById('p-toggle');
+        var repeatBtn  = document.getElementById('repeat-btn');
+        var repeatLbl  = document.getElementById('repeat-label');
+        var repeatBdg  = document.getElementById('repeat-badge');
+
+        var ICON_PLAY  = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+        var ICON_PAUSE = '<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>';
+
+        var songs = [];
+        var baseUrl = '';
+        var current = -1;          // index of the loaded song, -1 = none
+        var rows = [];             // per-song DOM refs, parallel to songs
+
+        // off -> one -> all -> off
+        var REPEAT_MODES = [
+            { id: 'off', label: 'ללא חזרה', badge: '' },
+            { id: 'one', label: 'חזרה על שיר', badge: '1' },
+            { id: 'all', label: 'חזרה על הסט', badge: '∞' }
+        ];
+        var repeatIdx = 0;
+
+        /* ---------- helpers ---------- */
+
+        // Encode each path segment separately so "charts/foo.pdf" keeps its slash.
+        function urlFor(path) {
+            return baseUrl + String(path).split('/').map(encodeURIComponent).join('/');
+        }
+
+        function fmtTime(sec) {
+            if (!isFinite(sec) || sec < 0) sec = 0;
+            var m = Math.floor(sec / 60);
+            var s = Math.floor(sec % 60);
+            return m + ':' + (s < 10 ? '0' : '') + s;
+        }
+
+        function setSeekVisual(input, pct) {
+            input.value = String(pct);
+            input.style.setProperty('--pct', pct + '%');
+        }
+
+        /* ---------- rendering ---------- */
+
+        function render() {
+            listEl.innerHTML = '';
+            rows = [];
+
+            songs.forEach(function (song, i) {
+                var li = document.createElement('li');
+                li.className = 'song';
+                li.id = 'song-' + song.id;
+
+                var row = document.createElement('div');
+                row.className = 'song-row';
+
+                var num = document.createElement('span');
+                num.className = 'track-num';
+                num.textContent = String(i + 1);
+
+                var playBtn = document.createElement('button');
+                playBtn.className = 'play-btn';
+                playBtn.innerHTML = ICON_PLAY;
+                playBtn.setAttribute('aria-label', 'נגן את ' + song.title);
+                playBtn.addEventListener('click', function () { toggleSong(i); });
+
+                var title = document.createElement('span');
+                title.className = 'song-title';
+                title.textContent = song.title;
+
+                var actions = document.createElement('div');
+                actions.className = 'song-actions';
+
+                // BPM chip -> visualizer. Hidden when bpm is null.
+                if (song.bpm) {
+                    var bpmChip = document.createElement('button');
+                    bpmChip.className = 'chip bpm';
+                    bpmChip.textContent = song.bpm + ' BPM';
+                    bpmChip.title = 'הצג ויזואליזציה של הקצב';
+                    bpmChip.addEventListener('click', function () { openBpm(song); });
+                    actions.appendChild(bpmChip);
+                }
+
+                // Chart chip -> only when a PDF exists for this song.
+                if (song.chart) {
+                    var chartChip = document.createElement('button');
+                    chartChip.className = 'chip square';
+                    chartChip.title = 'הצג אקורדים';
+                    chartChip.setAttribute('aria-label', 'הצג אקורדים של ' + song.title);
+                    chartChip.innerHTML =
+                        '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>' +
+                        '<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>';
+                    chartChip.addEventListener('click', function () { openChart(song); });
+                    actions.appendChild(chartChip);
+                }
+
+                var dlChip = document.createElement('button');
+                dlChip.className = 'chip square';
+                dlChip.title = 'הורד את ההקלטה';
+                dlChip.setAttribute('aria-label', 'הורד את ' + song.title);
+                dlChip.innerHTML =
+                    '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>' +
+                    '<polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+                dlChip.addEventListener('click', function () { download(song, dlChip); });
+                actions.appendChild(dlChip);
+
+                row.appendChild(num);
+                row.appendChild(playBtn);
+                row.appendChild(title);
+                row.appendChild(actions);
+
+                var seekWrap = document.createElement('div');
+                seekWrap.className = 'seek-wrap';
+
+                var seek = document.createElement('input');
+                seek.type = 'range';
+                seek.className = 'seek';
+                seek.min = '0';
+                seek.max = '100';
+                seek.step = '0.1';
+                seek.value = '0';
+                seek.setAttribute('aria-label', 'התקדמות בשיר ' + song.title);
+                seek.style.setProperty('--pct', '0%');
+
+                // Dragging an inactive song's bar loads it and seeks there.
+                seek.addEventListener('input', function () {
+                    var pct = parseFloat(seek.value);
+                    seek.style.setProperty('--pct', pct + '%');
+                    if (current === i) {
+                        if (isFinite(audio.duration)) audio.currentTime = audio.duration * pct / 100;
+                    } else {
+                        loadSong(i, false);
+                        var pending = function () {
+                            if (isFinite(audio.duration)) audio.currentTime = audio.duration * pct / 100;
+                            audio.removeEventListener('loadedmetadata', pending);
+                        };
+                        audio.addEventListener('loadedmetadata', pending);
+                    }
+                });
+
+                seekWrap.appendChild(seek);
+                li.appendChild(row);
+                li.appendChild(seekWrap);
+                listEl.appendChild(li);
+
+                rows.push({ li: li, playBtn: playBtn, seek: seek });
+            });
+
+            countEl.textContent = songs.length + ' שירים';
+            stateEl.style.display = 'none';
+        }
+
+        /* ---------- playback ---------- */
+
+        function loadSong(i, autoplay) {
+            if (i < 0 || i >= songs.length) return;
+            if (current !== i) {
+                current = i;
+                audio.src = urlFor(songs[i].audio);
+                paintActive();
+            }
+            if (autoplay) {
+                var p = audio.play();
+                if (p && p.catch) p.catch(function () { /* autoplay blocked / aborted */ });
+            }
+        }
+
+        function toggleSong(i) {
+            if (current === i) {
+                if (audio.paused) { audio.play(); } else { audio.pause(); }
+            } else {
+                loadSong(i, true);
+            }
+        }
+
+        function paintActive() {
+            rows.forEach(function (r, i) {
+                var isCur = i === current;
+                r.li.classList.toggle('active', isCur);
+                if (!isCur) {
+                    r.playBtn.innerHTML = ICON_PLAY;
+                    setSeekVisual(r.seek, 0);
+                }
+            });
+            if (current >= 0) {
+                pTitle.textContent = songs[current].title;
+                player.classList.add('visible');
+            }
+            paintPlayState();
+        }
+
+        function paintPlayState() {
+            var playing = current >= 0 && !audio.paused && !audio.ended;
+            pToggle.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
+            if (current >= 0 && rows[current]) {
+                rows[current].playBtn.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
+            }
+        }
+
+        function step(delta) {
+            if (!songs.length) return;
+            var next = (current < 0 ? 0 : current + delta);
+            if (next < 0) next = songs.length - 1;
+            if (next >= songs.length) next = 0;
+            loadSong(next, true);
+        }
+
+        function onEnded() {
+            var mode = REPEAT_MODES[repeatIdx].id;
+
+            if (mode === 'one') {
+                audio.currentTime = 0;
+                audio.play();
+                return;
+            }
+
+            var isLast = current === songs.length - 1;
+            if (isLast && mode === 'off') {
+                // End of the set: stop, rewind, leave the last song selected.
+                audio.currentTime = 0;
+                paintPlayState();
+                if (rows[current]) setSeekVisual(rows[current].seek, 0);
+                return;
+            }
+            step(1);
+        }
+
+        function cycleRepeat() {
+            repeatIdx = (repeatIdx + 1) % REPEAT_MODES.length;
+            var mode = REPEAT_MODES[repeatIdx];
+            repeatLbl.textContent = mode.label;
+            repeatBdg.textContent = mode.badge;
+            repeatBtn.classList.toggle('repeat-on', mode.id !== 'off');
+            repeatBtn.setAttribute('aria-pressed', mode.id !== 'off' ? 'true' : 'false');
+        }
+
+        audio.addEventListener('timeupdate', function () {
+            if (current < 0 || !rows[current]) return;
+            var d = audio.duration;
+            var pct = isFinite(d) && d > 0 ? (audio.currentTime / d) * 100 : 0;
+            setSeekVisual(rows[current].seek, pct);
+            pTime.textContent = fmtTime(audio.currentTime) + ' / ' + fmtTime(d);
+        });
+
+        audio.addEventListener('loadedmetadata', function () {
+            pTime.textContent = fmtTime(audio.currentTime) + ' / ' + fmtTime(audio.duration);
+        });
+
+        audio.addEventListener('play', paintPlayState);
+        audio.addEventListener('pause', paintPlayState);
+        audio.addEventListener('ended', onEnded);
+
+        audio.addEventListener('error', function () {
+            if (current < 0) return;
+            pTitle.textContent = 'שגיאה בטעינת ' + songs[current].title;
+        });
+
+        /* ---------- download ----------
+           The `download` attribute is ignored for cross-origin URLs, so a plain
+           <a download> would just navigate to the MP3. Fetch to a blob instead
+           (needs CORS on the bucket) and fall back to opening the URL. */
+        function download(song, btn) {
+            var url = urlFor(song.audio);
+            btn.setAttribute('aria-busy', 'true');
+
+            fetch(url)
+                .then(function (res) {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.blob();
+                })
+                .then(function (blob) {
+                    var href = URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = href;
+                    a.download = song.audio;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    setTimeout(function () { URL.revokeObjectURL(href); }, 30000);
+                })
+                .catch(function () {
+                    window.open(url, '_blank', 'noopener');
+                })
+                .then(function () {
+                    btn.removeAttribute('aria-busy');
+                });
+        }
+
+        /* ---------- BPM visualizer ---------- */
+        var bpmModal = document.getElementById('bpm-modal');
+        var pulseCore = document.getElementById('pulse-core');
+        var pulseRing = document.getElementById('pulse-ring');
+        var beatDots  = document.getElementById('beat-dots');
+        var rafId = null;
+        var BEATS_PER_BAR = 4;
+
+        function openBpm(song) {
+            document.getElementById('bpm-song').textContent = song.title;
+            document.getElementById('bpm-value').textContent = song.bpm;
+
+            beatDots.innerHTML = '';
+            var dots = [];
+            for (var b = 0; b < BEATS_PER_BAR; b++) {
+                var d = document.createElement('span');
+                d.className = 'beat-dot' + (b === 0 ? ' downbeat' : '');
+                beatDots.appendChild(d);
+                dots.push(d);
+            }
+
+            bpmModal.classList.add('active');
+
+            // rAF + performance.now() rather than setInterval: setInterval drifts
+            // and the visual would slide out of time within a few bars.
+            var interval = 60000 / song.bpm;
+            var t0 = performance.now();
+            var lastBeat = -1;
+
+            function frame(now) {
+                var beat = Math.floor((now - t0) / interval);
+                if (beat !== lastBeat) {
+                    lastBeat = beat;
+                    var pos = ((beat % BEATS_PER_BAR) + BEATS_PER_BAR) % BEATS_PER_BAR;
+
+                    dots.forEach(function (d, idx) { d.classList.toggle('on', idx === pos); });
+
+                    pulseCore.classList.remove('hit');
+                    pulseRing.classList.remove('hit');
+                    // Force reflow so the animation restarts on every beat.
+                    void pulseCore.offsetWidth;
+                    pulseCore.classList.add('hit');
+                    pulseRing.classList.add('hit');
+
+                    setTimeout(function () { pulseCore.classList.remove('hit'); },
+                              Math.min(120, interval / 2));
+                }
+                rafId = requestAnimationFrame(frame);
+            }
+            rafId = requestAnimationFrame(frame);
+        }
+
+        function closeBpm() {
+            bpmModal.classList.remove('active');
+            if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+        }
+
+        /* ---------- chart modal ---------- */
+        var chartModal = document.getElementById('chart-modal');
+        var chartFrame = document.getElementById('chart-frame');
+        var chartOpen  = document.getElementById('chart-open');
+
+        function openChart(song) {
+            var url = urlFor(song.chart);
+            chartFrame.src = url;
+            chartOpen.href = url;
+            chartModal.classList.add('active');
+        }
+
+        function closeChart() {
+            chartModal.classList.remove('active');
+            chartFrame.src = '';   // stop rendering / free memory
+        }
+
+        /* ---------- wiring ---------- */
+        document.getElementById('play-all').addEventListener('click', function () {
+            loadSong(0, true);
+        });
+        repeatBtn.addEventListener('click', cycleRepeat);
+        pToggle.addEventListener('click', function () {
+            if (current < 0) { loadSong(0, true); return; }
+            if (audio.paused) { audio.play(); } else { audio.pause(); }
+        });
+        document.getElementById('p-prev').addEventListener('click', function () { step(-1); });
+        document.getElementById('p-next').addEventListener('click', function () { step(1); });
+        document.getElementById('bpm-close').addEventListener('click', closeBpm);
+        document.getElementById('chart-close').addEventListener('click', closeChart);
+
+        bpmModal.addEventListener('click', function (e) { if (e.target === bpmModal) closeBpm(); });
+        chartModal.addEventListener('click', function (e) { if (e.target === chartModal) closeChart(); });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') { closeBpm(); closeChart(); }
+
+            var tag = (e.target.tagName || '').toLowerCase();
+            var typing = tag === 'input' || tag === 'textarea' || tag === 'select';
+            if (e.code === 'Space' && !typing && !bpmModal.classList.contains('active')) {
+                e.preventDefault();
+                pToggle.click();
+            }
+        });
+
+        /* ---------- load data ----------
+           fetch() is subject to CORS and a file:// origin is opaque, so opening
+           this page by double-clicking it can never read the JSON. Detect that
+           up front — the browser's own message ("Load failed") is unhelpful. */
+        if (location.protocol === 'file:') {
+            stateEl.className = 'state-msg error';
+            stateEl.innerHTML =
+                'הדף נפתח ישירות מהקובץ (file://) ולכן הדפדפן חוסם את טעינת הנתונים.<br>' +
+                'להרצה מקומית יש להריץ שרת מקומי בתיקיית הפרויקט:<br>' +
+                '<code style="display:inline-block;margin-top:8px;padding:6px 12px;' +
+                'background:rgba(255,255,255,0.08);border-radius:6px;direction:ltr">' +
+                'python3 -m http.server 8000</code><br>' +
+                '<span style="font-size:0.85rem">ואז לפתוח ' +
+                '<span style="direction:ltr;display:inline-block">http://localhost:8000/setlist.html</span></span>';
+            return;
+        }
+
+        fetch('data/setlist.json', { cache: 'no-cache' })
+            .then(function (res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(function (data) {
+                baseUrl = data.baseUrl || '';
+                songs = Array.isArray(data.songs) ? data.songs : [];
+                if (!songs.length) {
+                    stateEl.textContent = 'הסטליסט ריק.';
+                    return;
+                }
+                render();
+            })
+            .catch(function (err) {
+                stateEl.className = 'state-msg error';
+                stateEl.textContent =
+                    'לא ניתן לטעון את הסטליסט: ' + err.message +
+                    ' — ודאו שהקובץ data/setlist.json קיים ונגיש.';
+            });
+    })();
+    </script>
+</body>
+</html>
