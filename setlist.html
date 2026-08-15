@@ -381,7 +381,7 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 20px 20px 78px;   /* bottom reserved for the nav pill */
         }
 
         .modal.active { display: flex; animation: fadeIn 0.25s ease forwards; }
@@ -403,6 +403,55 @@
         }
 
         .modal-close:hover { background: rgba(255, 255, 255, 0.25); }
+
+        /* Prev / position / next pill, shared by all three modals.
+           Bottom-centre rather than side arrows so it never overlaps the PDF
+           on narrow screens, and stays thumb-reachable on a phone.
+           direction:ltr so the chevrons keep their physical meaning in RTL. */
+        .modal-nav {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            direction: ltr;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px;
+            border-radius: 40px;
+            background: rgba(13, 14, 18, 0.82);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            z-index: 1010;
+        }
+
+        .modal-nav-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--text-main);
+            font-size: 1.05rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .modal-nav-btn:hover { background: rgba(255, 255, 255, 0.15); }
+        .modal-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; background: transparent; }
+
+        .modal-nav-counter {
+            min-width: 3.6rem;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+        }
 
         /* BPM visualizer */
         .bpm-box { text-align: center; user-select: none; }
@@ -461,7 +510,10 @@
         /* Chart (PDF) modal */
         .chart-frame-wrap {
             width: min(96vw, 900px);
-            height: min(92vh, 1000px);
+            /* Fills the space the modal leaves above the nav pill, rather than a
+               fixed vh that would sit under it. */
+            height: 100%;
+            max-height: 1000px;
             background: #fff;
             border-radius: 12px;
             overflow: hidden;
@@ -485,7 +537,7 @@
         /* Lyrics modal */
         .lyrics-box {
             width: min(94vw, 620px);
-            max-height: 86vh;
+            max-height: 100%;
             background: var(--card-bg);
             border: 1px solid var(--glass-border);
             border-radius: 14px;
@@ -761,7 +813,7 @@
                     available: !!song.bpm,
                     title: 'הצג ויזואליזציה של הקצב',
                     unavailableTitle: 'אין נתון קצב לשיר זה',
-                    onClick: function () { openBpm(song); }
+                    onClick: function () { showModal('bpm', i); }
                 }));
 
                 // Lyrics chip -> text viewer.
@@ -772,7 +824,7 @@
                     available: !!song.lyrics,
                     title: 'הצג מילים',
                     unavailableTitle: 'אין מילים לשיר זה',
-                    onClick: function () { openLyrics(song); }
+                    onClick: function () { showModal('lyrics', i); }
                 }));
 
                 // Chart chip -> PDF viewer.
@@ -783,7 +835,7 @@
                     available: !!song.chart,
                     title: 'הצג אקורדים',
                     unavailableTitle: 'אין אקורדים לשיר זה',
-                    onClick: function () { openChart(song); }
+                    onClick: function () { showModal('chart', i); }
                 }));
 
                 // Download chip.
@@ -988,7 +1040,15 @@
         var rafId = null;
         var BEATS_PER_BAR = 4;
 
-        function openBpm(song) {
+        function stopBpmLoop() {
+            if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+        }
+
+        function renderBpm(song) {
+            // Always stop the previous loop first — navigating between songs
+            // would otherwise leave orphaned rAF loops fighting over the DOM.
+            stopBpmLoop();
+
             document.getElementById('bpm-song').textContent = song.title;
             document.getElementById('bpm-value').textContent = song.bpm;
 
@@ -1000,8 +1060,6 @@
                 beatDots.appendChild(d);
                 dots.push(d);
             }
-
-            bpmModal.classList.add('active');
 
             // rAF + performance.now() rather than setInterval: setInterval drifts
             // and the visual would slide out of time within a few bars.
@@ -1032,26 +1090,15 @@
             rafId = requestAnimationFrame(frame);
         }
 
-        function closeBpm() {
-            bpmModal.classList.remove('active');
-            if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
-        }
-
         /* ---------- chart modal ---------- */
         var chartModal = document.getElementById('chart-modal');
         var chartFrame = document.getElementById('chart-frame');
         var chartOpen  = document.getElementById('chart-open');
 
-        function openChart(song) {
+        function renderChart(song) {
             var url = urlFor(song.chart);
             chartFrame.src = url + '#view=Fit&toolbar=0&navpanes=0';
             chartOpen.href = url;
-            chartModal.classList.add('active');
-        }
-
-        function closeChart() {
-            chartModal.classList.remove('active');
-            chartFrame.src = '';   // stop rendering / free memory
         }
 
         /* ---------- lyrics modal ----------
@@ -1061,10 +1108,11 @@
         var lyricsTitle = document.getElementById('lyrics-title');
         var lyricsBody  = document.getElementById('lyrics-body');
         var lyricsCache = {};
+        var lyricsReq = 0;
 
-        function openLyrics(song) {
+        function renderLyrics(song) {
             lyricsTitle.textContent = song.title;
-            lyricsModal.classList.add('active');
+            lyricsBody.scrollTop = 0;
 
             if (Object.prototype.hasOwnProperty.call(lyricsCache, song.id)) {
                 lyricsBody.className = 'lyrics-body';
@@ -1075,7 +1123,10 @@
             lyricsBody.className = 'lyrics-body msg';
             lyricsBody.textContent = 'טוען מילים…';
 
+            // Swiping fast can start several fetches; only the newest may paint.
+            var token = ++lyricsReq;
             var url = urlFor(song.lyrics);
+
             fetch(url)
                 .then(function (res) {
                     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -1083,10 +1134,13 @@
                 })
                 .then(function (text) {
                     lyricsCache[song.id] = text;
+                    if (token !== lyricsReq) return;
                     lyricsBody.className = 'lyrics-body';
                     lyricsBody.textContent = text;
+                    lyricsBody.scrollTop = 0;
                 })
                 .catch(function (err) {
+                    if (token !== lyricsReq) return;
                     lyricsBody.className = 'lyrics-body msg';
                     lyricsBody.textContent = 'לא ניתן לטעון את המילים (' + err.message + '). ';
                     var a = document.createElement('a');
@@ -1098,9 +1152,139 @@
                 });
         }
 
-        function closeLyrics() {
-            lyricsModal.classList.remove('active');
+        /* ---------- shared modal controller ----------
+           One place that knows which modal is open and on which song, so
+           swipe / arrow navigation can walk the setlist without closing it. */
+        var MODALS = {
+            bpm:    { el: bpmModal,    render: renderBpm,    has: function (s) { return !!s.bpm; } },
+            chart:  { el: chartModal,  render: renderChart,  has: function (s) { return !!s.chart; } },
+            lyrics: { el: lyricsModal, render: renderLyrics, has: function (s) { return !!s.lyrics; } }
+        };
+
+        var activeKind = null;
+        var activeIdx = -1;
+        var navRefs = {};
+
+        // Indices of songs that actually have this asset, so navigation skips
+        // the ones that would open an empty view.
+        function eligible(kind) {
+            var has = MODALS[kind].has;
+            var out = [];
+            songs.forEach(function (s, i) { if (has(s)) out.push(i); });
+            return out;
         }
+
+        function showModal(kind, idx) {
+            var cfg = MODALS[kind];
+            if (!cfg || !songs[idx]) return;
+
+            activeKind = kind;
+            activeIdx = idx;
+
+            cfg.render(songs[idx]);
+            cfg.el.classList.add('active');
+            updateNav();
+        }
+
+        function closeModal() {
+            if (!activeKind) return;
+            var cfg = MODALS[activeKind];
+            cfg.el.classList.remove('active');
+
+            if (activeKind === 'bpm') stopBpmLoop();
+            if (activeKind === 'chart') chartFrame.src = '';  // stop rendering / free memory
+
+            activeKind = null;
+            activeIdx = -1;
+        }
+
+        function navigateModal(delta) {
+            if (!activeKind) return;
+            var list = eligible(activeKind);
+            if (list.length < 2) return;
+
+            var pos = list.indexOf(activeIdx);
+            if (pos === -1) pos = 0;
+            var next = (pos + delta + list.length) % list.length;
+            showModal(activeKind, list[next]);
+        }
+
+        function updateNav() {
+            var list = eligible(activeKind);
+            var pos = list.indexOf(activeIdx);
+            var refs = navRefs[activeKind];
+            if (!refs) return;
+
+            refs.counter.textContent = (pos + 1) + ' / ' + list.length;
+            var single = list.length < 2;
+            refs.prev.disabled = single;
+            refs.next.disabled = single;
+            refs.wrap.style.display = single ? 'none' : '';
+        }
+
+        // Build the prev / counter / next pill inside each modal once.
+        Object.keys(MODALS).forEach(function (kind) {
+            var wrap = document.createElement('div');
+            wrap.className = 'modal-nav';
+
+            var prev = document.createElement('button');
+            prev.className = 'modal-nav-btn';
+            prev.innerHTML = '&#10094;';
+            prev.setAttribute('aria-label', 'הקודם');
+            prev.addEventListener('click', function () { navigateModal(-1); });
+
+            var counter = document.createElement('span');
+            counter.className = 'modal-nav-counter';
+
+            var next = document.createElement('button');
+            next.className = 'modal-nav-btn';
+            next.innerHTML = '&#10095;';
+            next.setAttribute('aria-label', 'הבא');
+            next.addEventListener('click', function () { navigateModal(1); });
+
+            wrap.appendChild(prev);
+            wrap.appendChild(counter);
+            wrap.appendChild(next);
+            MODALS[kind].el.appendChild(wrap);
+
+            navRefs[kind] = { wrap: wrap, prev: prev, counter: counter, next: next };
+        });
+
+        /* ---------- swipe ----------
+           Touch events inside a cross-origin <iframe> never reach us, so on the
+           chart modal a swipe landing on the PDF itself is consumed by the PDF
+           viewer; the surrounding area and the arrow buttons still work. */
+        var SWIPE_MIN = 50;        // px of horizontal travel required
+        var SWIPE_RATIO = 1.5;     // must be this much more horizontal than vertical
+        var touchX = 0, touchY = 0, touching = false;
+
+        Object.keys(MODALS).forEach(function (kind) {
+            var el = MODALS[kind].el;
+
+            el.addEventListener('touchstart', function (e) {
+                if (e.touches.length !== 1) { touching = false; return; }
+                touching = true;
+                touchX = e.touches[0].clientX;
+                touchY = e.touches[0].clientY;
+            }, { passive: true });
+
+            el.addEventListener('touchend', function (e) {
+                if (!touching) return;
+                touching = false;
+
+                var t = e.changedTouches[0];
+                var dx = t.clientX - touchX;
+                var dy = t.clientY - touchY;
+
+                if (Math.abs(dx) < SWIPE_MIN) return;
+                // Let vertical drags scroll the lyrics instead of navigating.
+                if (Math.abs(dx) < Math.abs(dy) * SWIPE_RATIO) return;
+
+                // Swipe left advances, matching the arrow-key mapping in
+                // index.html (ArrowRight = next) and standard gallery behaviour.
+                navigateModal(dx < 0 ? 1 : -1);
+            }, { passive: true });
+        });
 
         /* ---------- wiring ---------- */
         document.getElementById('play-all').addEventListener('click', function () {
@@ -1113,23 +1297,30 @@
         });
         document.getElementById('p-prev').addEventListener('click', function () { step(-1); });
         document.getElementById('p-next').addEventListener('click', function () { step(1); });
-        document.getElementById('bpm-close').addEventListener('click', closeBpm);
-        document.getElementById('chart-close').addEventListener('click', closeChart);
-        document.getElementById('lyrics-close').addEventListener('click', closeLyrics);
+        document.getElementById('bpm-close').addEventListener('click', closeModal);
+        document.getElementById('chart-close').addEventListener('click', closeModal);
+        document.getElementById('lyrics-close').addEventListener('click', closeModal);
 
-        bpmModal.addEventListener('click', function (e) { if (e.target === bpmModal) closeBpm(); });
-        chartModal.addEventListener('click', function (e) { if (e.target === chartModal) closeChart(); });
-        lyricsModal.addEventListener('click', function (e) { if (e.target === lyricsModal) closeLyrics(); });
+        Object.keys(MODALS).forEach(function (kind) {
+            MODALS[kind].el.addEventListener('click', function (e) {
+                if (e.target === MODALS[kind].el) closeModal();
+            });
+        });
 
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') { closeBpm(); closeChart(); closeLyrics(); }
-
             var tag = (e.target.tagName || '').toLowerCase();
             var typing = tag === 'input' || tag === 'textarea' || tag === 'select';
-            var modalOpen = bpmModal.classList.contains('active') ||
-                            lyricsModal.classList.contains('active') ||
-                            chartModal.classList.contains('active');
-            if (e.code === 'Space' && !typing && !modalOpen) {
+
+            if (activeKind) {
+                if (e.key === 'Escape') { closeModal(); return; }
+                // PC equivalent of the swipe. Matches index.html's lightbox:
+                // ArrowRight = next, ArrowLeft = previous.
+                if (e.key === 'ArrowRight') { e.preventDefault(); navigateModal(1); return; }
+                if (e.key === 'ArrowLeft')  { e.preventDefault(); navigateModal(-1); return; }
+                return;   // don't let Space reach the player while a modal is up
+            }
+
+            if (e.code === 'Space' && !typing) {
                 e.preventDefault();
                 pToggle.click();
             }
