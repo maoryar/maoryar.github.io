@@ -5,7 +5,7 @@
       "id": "yesh-beineinu-bayit",
       "title": "יש בינינו בית",
       "audio": "יש בנינו בית.mp3",
-      "chart": null,
+      "chart": "charts/יש בינינו בית.pdf",
       "bpm": 60
     },
     {
@@ -19,42 +19,42 @@
       "id": "od-yihye-li",
       "title": "עוד יהיה לי",
       "audio": "עוד יהיה לי.mp3",
-      "chart": null,
+      "chart": "charts/מעודכן_עוד יהיה לי.pdf",
       "bpm": 60
     },
     {
       "id": "let-it-go",
       "title": "Let It Go",
       "audio": "Let it go.mp3",
-      "chart": null,
+      "chart": "charts/Let it Go.pdf",
       "bpm": 60
     },
     {
       "id": "tel-aviv-balayla",
       "title": "תל אביב בלילה",
       "audio": "תל אביב בלילה.mp3",
-      "chart": null,
+      "chart": "charts/תל אביב בלילה.pdf",
       "bpm": 60
     },
     {
       "id": "shir-hasmartutim",
       "title": "שיר הסמרטוטים",
       "audio": "שיר הסמרטוטים.mp3",
-      "chart": null,
+      "chart": "charts/סמרטוטים A-C.pdf",
       "bpm": 60
     },
     {
       "id": "larger-than-life",
       "title": "Larger Than Life",
       "audio": "Larger than life.mp3",
-      "chart": null,
+      "chart": "charts/מעודכן_Larger Than Life.pdf",
       "bpm": 60
     },
     {
       "id": "dawinim",
       "title": "דאווינים",
       "audio": "דאווינים.mp3",
-      "chart": null,
+      "chart": "charts/דאווינים.pdf",
       "bpm": 60
     },
     {
@@ -75,14 +75,14 @@
       "id": "dance-monkey",
       "title": "Dance Monkey",
       "audio": "dance monkey.mp3",
-      "chart": null,
+      "chart": "charts/Dance Monkey.pdf",
       "bpm": 60
     },
     {
       "id": "kok-batzohorayim",
       "title": "קוק בצהריים",
       "audio": "קוק בצהריים.mp3",
-      "chart": null,
+      "chart": "charts/קוק בצהריים.pdf",
       "bpm": 60
     },
     {
@@ -103,7 +103,7 @@
       "id": "shtei-meshugaot",
       "title": "שתי משוגעות",
       "audio": "שתי משוגעות.mp3",
-      "chart": null,
+      "chart": "charts/שתי_משוגעות-מעודכן.pdf",
       "bpm": 60
     },
     {
