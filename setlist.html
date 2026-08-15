@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>חוגזי | Choogzi - סטליסט</title>
 
+    <!-- PDF.js library for crisp auto-fit PDF chart rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -445,7 +448,7 @@
         .chart-frame-wrap {
             width: min(96vw, 900px);
             height: min(92vh, 1000px);
-            background: #fff;
+            background: #111;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
@@ -454,7 +457,27 @@
             touch-action: manipulation;
         }
 
-        .chart-frame-wrap iframe { flex: 1; width: 100%; height: 100%; border: none; }
+        .chart-canvas-container {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            background: #18181b;
+            position: relative;
+            padding: 10px;
+        }
+
+        #chart-canvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+            border-radius: 4px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+        }
 
         .chart-fallback {
             padding: 10px;
@@ -569,9 +592,11 @@
     <div class="modal" id="chart-modal" role="dialog" aria-modal="true" aria-label="אקורדים">
         <button class="modal-close" id="chart-close" aria-label="סגור">&times;</button>
         <div class="chart-frame-wrap">
-            <iframe id="chart-frame" title="אקורדים"></iframe>
+            <div class="chart-canvas-container" id="chart-canvas-container">
+                <canvas id="chart-canvas"></canvas>
+            </div>
             <div class="chart-fallback">
-                <a id="chart-open" href="#" target="_blank" rel="noopener noreferrer">לא נטען? פתח את ה-PDF בלשונית חדשה</a>
+                <a id="chart-open" href="#" target="_blank" rel="noopener noreferrer">פתח את ה-PDF בלשונית חדשה ↗</a>
             </div>
         </div>
     </div>
@@ -940,19 +965,55 @@
 
         /* ---------- chart modal ---------- */
         var chartModal = document.getElementById('chart-modal');
-        var chartFrame = document.getElementById('chart-frame');
         var chartOpen  = document.getElementById('chart-open');
+        var chartCanvas = document.getElementById('chart-canvas');
+        var chartContainer = document.getElementById('chart-canvas-container');
+
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
 
         function openChart(song) {
             var url = urlFor(song.chart);
-            chartFrame.src = url + '#view=Fit&toolbar=0&navpanes=0';
             chartOpen.href = url;
             chartModal.classList.add('active');
+
+            if (!window.pdfjsLib) return;
+
+            var ctx = chartCanvas.getContext('2d');
+            ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+
+            pdfjsLib.getDocument(url).promise.then(function (pdf) {
+                pdf.getPage(1).then(function (page) {
+                    var contWidth = (chartContainer.clientWidth || 800) - 16;
+                    var contHeight = (chartContainer.clientHeight || 900) - 16;
+
+                    var unscaledViewport = page.getViewport({ scale: 1.0 });
+                    var scaleX = contWidth / unscaledViewport.width;
+                    var scaleY = contHeight / unscaledViewport.height;
+                    var fitScale = Math.min(scaleX, scaleY);
+
+                    var dpr = window.devicePixelRatio || 1;
+                    var viewport = page.getViewport({ scale: fitScale * dpr });
+
+                    chartCanvas.width = viewport.width;
+                    chartCanvas.height = viewport.height;
+                    chartCanvas.style.width = Math.floor(viewport.width / dpr) + 'px';
+                    chartCanvas.style.height = Math.floor(viewport.height / dpr) + 'px';
+
+                    var renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    page.render(renderContext);
+                });
+            }).catch(function (err) {
+                console.error('PDF.js error:', err);
+            });
         }
 
         function closeChart() {
             chartModal.classList.remove('active');
-            chartFrame.src = '';   // stop rendering / free memory
         }
 
         /* ---------- wiring ---------- */
