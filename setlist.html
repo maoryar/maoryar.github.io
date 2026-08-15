@@ -241,6 +241,23 @@
         .chip.bpm:hover { color: var(--accent-hover); border-color: rgba(230, 104, 60, 0.5); }
         .chip[aria-busy="true"] { opacity: 0.5; pointer-events: none; }
 
+        /* Unavailable chips stay in the row (so every row lines up) but read as
+           inert. Must come after the :hover rules above — equal specificity,
+           source order wins. */
+        .chip:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
+        .chip:disabled:hover {
+            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+        }
+
         /* ---------- Seek bar ----------
            direction:ltr on purpose: audio time reads left-to-right even in an
            RTL page, matching how YouTube/Spotify behave in Hebrew locales. */
@@ -465,6 +482,45 @@
 
         .chart-fallback a { color: var(--accent-hover); font-size: 0.9rem; }
 
+        /* Lyrics modal */
+        .lyrics-box {
+            width: min(94vw, 620px);
+            max-height: 86vh;
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 1.5rem 1.3rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+        }
+
+        .lyrics-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 0.9rem;
+            padding-inline-end: 2.6rem;
+            flex: 0 0 auto;
+        }
+
+        .lyrics-body {
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            line-height: 1.85;
+            font-size: 1.05rem;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .lyrics-body.msg {
+            color: var(--text-muted);
+            text-align: center;
+            padding: 1.5rem 0;
+            white-space: normal;
+        }
+
+        .lyrics-body.msg a { color: var(--accent-hover); }
+
         /* States */
         .state-msg { text-align: center; color: var(--text-muted); padding: 3rem 1rem; }
         .state-msg.error { color: #f87171; }
@@ -576,6 +632,15 @@
         </div>
     </div>
 
+    <!-- Lyrics viewer -->
+    <div class="modal" id="lyrics-modal" role="dialog" aria-modal="true" aria-labelledby="lyrics-title">
+        <button class="modal-close" id="lyrics-close" aria-label="סגור">&times;</button>
+        <div class="lyrics-box">
+            <h2 class="lyrics-title" id="lyrics-title"></h2>
+            <div class="lyrics-body" id="lyrics-body"></div>
+        </div>
+    </div>
+
     <footer>
         &copy; <span id="year"></span> חוגזי • Choogzi - כל הזכויות שמורות
     </footer>
@@ -635,6 +700,29 @@
             input.style.setProperty('--pct', pct + '%');
         }
 
+        /* Every action chip is rendered on every row so the rows stay aligned;
+           when the underlying asset is missing the chip is disabled instead of
+           omitted, and its tooltip explains why. */
+        function makeChip(cfg) {
+            var btn = document.createElement('button');
+            btn.className = 'chip' +
+                (cfg.square ? ' square' : '') +
+                (cfg.extraClass ? ' ' + cfg.extraClass : '');
+
+            if (cfg.html) { btn.innerHTML = cfg.html; } else { btn.textContent = cfg.text; }
+
+            var label = cfg.available ? cfg.title : cfg.unavailableTitle;
+            btn.title = label;
+            btn.setAttribute('aria-label', label);
+
+            if (cfg.available) {
+                btn.addEventListener('click', cfg.onClick);
+            } else {
+                btn.disabled = true;
+            }
+            return btn;
+        }
+
         /* ---------- rendering ---------- */
 
         function render() {
@@ -666,37 +754,48 @@
                 var actions = document.createElement('div');
                 actions.className = 'song-actions';
 
-                // BPM chip -> visualizer. Hidden when bpm is null.
-                if (song.bpm) {
-                    var bpmChip = document.createElement('button');
-                    bpmChip.className = 'chip bpm';
-                    bpmChip.textContent = song.bpm + ' BPM';
-                    bpmChip.title = 'הצג ויזואליזציה של הקצב';
-                    bpmChip.addEventListener('click', function () { openBpm(song); });
-                    actions.appendChild(bpmChip);
-                }
+                // BPM chip -> visualizer.
+                actions.appendChild(makeChip({
+                    text: (song.bpm ? song.bpm : '--') + ' BPM',
+                    extraClass: 'bpm',
+                    available: !!song.bpm,
+                    title: 'הצג ויזואליזציה של הקצב',
+                    unavailableTitle: 'אין נתון קצב לשיר זה',
+                    onClick: function () { openBpm(song); }
+                }));
 
-                // Chart chip -> only when a PDF exists for this song.
-                if (song.chart) {
-                    var chartChip = document.createElement('button');
-                    chartChip.className = 'chip square';
-                    chartChip.title = 'הצג אקורדים';
-                    chartChip.setAttribute('aria-label', 'הצג אקורדים של ' + song.title);
-                    chartChip.innerHTML =
-                        '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>' +
-                        '<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>';
-                    chartChip.addEventListener('click', function () { openChart(song); });
-                    actions.appendChild(chartChip);
-                }
+                // Lyrics chip -> text viewer.
+                actions.appendChild(makeChip({
+                    square: true,
+                    html: '<svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/>' +
+                          '<line x1="4" y1="11" x2="20" y2="11"/><line x1="4" y1="16" x2="13" y2="16"/></svg>',
+                    available: !!song.lyrics,
+                    title: 'הצג מילים',
+                    unavailableTitle: 'אין מילים לשיר זה',
+                    onClick: function () { openLyrics(song); }
+                }));
 
-                var dlChip = document.createElement('button');
-                dlChip.className = 'chip square';
-                dlChip.title = 'הורד את ההקלטה';
-                dlChip.setAttribute('aria-label', 'הורד את ' + song.title);
-                dlChip.innerHTML =
-                    '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>' +
-                    '<polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
-                dlChip.addEventListener('click', function () { download(song, dlChip); });
+                // Chart chip -> PDF viewer.
+                actions.appendChild(makeChip({
+                    square: true,
+                    html: '<svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>' +
+                          '<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+                    available: !!song.chart,
+                    title: 'הצג אקורדים',
+                    unavailableTitle: 'אין אקורדים לשיר זה',
+                    onClick: function () { openChart(song); }
+                }));
+
+                // Download chip.
+                var dlChip = makeChip({
+                    square: true,
+                    html: '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>' +
+                          '<polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+                    available: !!song.audio,
+                    title: 'הורד את ההקלטה',
+                    unavailableTitle: 'אין הקלטה לשיר זה',
+                    onClick: function () { download(song, dlChip); }
+                });
                 actions.appendChild(dlChip);
 
                 row.appendChild(num);
@@ -955,6 +1054,54 @@
             chartFrame.src = '';   // stop rendering / free memory
         }
 
+        /* ---------- lyrics modal ----------
+           Plain-text files fetched from S3 (needs bucket CORS). Results are
+           cached per song so reopening is instant. */
+        var lyricsModal = document.getElementById('lyrics-modal');
+        var lyricsTitle = document.getElementById('lyrics-title');
+        var lyricsBody  = document.getElementById('lyrics-body');
+        var lyricsCache = {};
+
+        function openLyrics(song) {
+            lyricsTitle.textContent = song.title;
+            lyricsModal.classList.add('active');
+
+            if (Object.prototype.hasOwnProperty.call(lyricsCache, song.id)) {
+                lyricsBody.className = 'lyrics-body';
+                lyricsBody.textContent = lyricsCache[song.id];
+                return;
+            }
+
+            lyricsBody.className = 'lyrics-body msg';
+            lyricsBody.textContent = 'טוען מילים…';
+
+            var url = urlFor(song.lyrics);
+            fetch(url)
+                .then(function (res) {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.text();
+                })
+                .then(function (text) {
+                    lyricsCache[song.id] = text;
+                    lyricsBody.className = 'lyrics-body';
+                    lyricsBody.textContent = text;
+                })
+                .catch(function (err) {
+                    lyricsBody.className = 'lyrics-body msg';
+                    lyricsBody.textContent = 'לא ניתן לטעון את המילים (' + err.message + '). ';
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.textContent = 'פתח את הקובץ בלשונית חדשה';
+                    lyricsBody.appendChild(a);
+                });
+        }
+
+        function closeLyrics() {
+            lyricsModal.classList.remove('active');
+        }
+
         /* ---------- wiring ---------- */
         document.getElementById('play-all').addEventListener('click', function () {
             loadSong(0, true);
@@ -968,16 +1115,21 @@
         document.getElementById('p-next').addEventListener('click', function () { step(1); });
         document.getElementById('bpm-close').addEventListener('click', closeBpm);
         document.getElementById('chart-close').addEventListener('click', closeChart);
+        document.getElementById('lyrics-close').addEventListener('click', closeLyrics);
 
         bpmModal.addEventListener('click', function (e) { if (e.target === bpmModal) closeBpm(); });
         chartModal.addEventListener('click', function (e) { if (e.target === chartModal) closeChart(); });
+        lyricsModal.addEventListener('click', function (e) { if (e.target === lyricsModal) closeLyrics(); });
 
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') { closeBpm(); closeChart(); }
+            if (e.key === 'Escape') { closeBpm(); closeChart(); closeLyrics(); }
 
             var tag = (e.target.tagName || '').toLowerCase();
             var typing = tag === 'input' || tag === 'textarea' || tag === 'select';
-            if (e.code === 'Space' && !typing && !bpmModal.classList.contains('active')) {
+            var modalOpen = bpmModal.classList.contains('active') ||
+                            lyricsModal.classList.contains('active') ||
+                            chartModal.classList.contains('active');
+            if (e.code === 'Space' && !typing && !modalOpen) {
                 e.preventDefault();
                 pToggle.click();
             }
