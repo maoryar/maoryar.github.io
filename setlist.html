@@ -465,9 +465,9 @@
             justify-content: center;
             align-items: center;
             overflow: auto;
-            background: #18181b;
+            background: #ffffff;
             position: relative;
-            padding: 10px;
+            padding: 8px;
         }
 
         #chart-canvas {
@@ -980,36 +980,38 @@
 
             if (!window.pdfjsLib) return;
 
-            var ctx = chartCanvas.getContext('2d');
-            ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+            setTimeout(function () {
+                var ctx = chartCanvas.getContext('2d');
+                ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
 
-            pdfjsLib.getDocument(url).promise.then(function (pdf) {
-                pdf.getPage(1).then(function (page) {
-                    var contWidth = (chartContainer.clientWidth || 800) - 16;
-                    var contHeight = (chartContainer.clientHeight || 900) - 16;
+                pdfjsLib.getDocument({ url: url, withCredentials: false }).promise.then(function (pdf) {
+                    pdf.getPage(1).then(function (page) {
+                        var contWidth = (chartContainer.clientWidth || window.innerWidth * 0.9) - 16;
+                        var contHeight = (chartContainer.clientHeight || window.innerHeight * 0.8) - 16;
 
-                    var unscaledViewport = page.getViewport({ scale: 1.0 });
-                    var scaleX = contWidth / unscaledViewport.width;
-                    var scaleY = contHeight / unscaledViewport.height;
-                    var fitScale = Math.min(scaleX, scaleY);
+                        var unscaledViewport = page.getViewport({ scale: 1.0 });
+                        var scaleX = contWidth / unscaledViewport.width;
+                        var scaleY = contHeight / unscaledViewport.height;
+                        var fitScale = Math.min(scaleX, scaleY);
 
-                    var dpr = window.devicePixelRatio || 1;
-                    var viewport = page.getViewport({ scale: fitScale * dpr });
+                        var dpr = window.devicePixelRatio || 1;
+                        var viewport = page.getViewport({ scale: fitScale * dpr });
 
-                    chartCanvas.width = viewport.width;
-                    chartCanvas.height = viewport.height;
-                    chartCanvas.style.width = Math.floor(viewport.width / dpr) + 'px';
-                    chartCanvas.style.height = Math.floor(viewport.height / dpr) + 'px';
+                        chartCanvas.width = viewport.width;
+                        chartCanvas.height = viewport.height;
+                        chartCanvas.style.width = Math.floor(viewport.width / dpr) + 'px';
+                        chartCanvas.style.height = Math.floor(viewport.height / dpr) + 'px';
 
-                    var renderContext = {
-                        canvasContext: ctx,
-                        viewport: viewport
-                    };
-                    page.render(renderContext);
+                        var renderContext = {
+                            canvasContext: ctx,
+                            viewport: viewport
+                        };
+                        page.render(renderContext);
+                    });
+                }).catch(function (err) {
+                    console.error('PDF.js error:', err);
                 });
-            }).catch(function (err) {
-                console.error('PDF.js error:', err);
-            });
+            }, 50);
         }
 
         function closeChart() {
