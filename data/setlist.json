@@ -6,7 +6,7 @@
       "title": "יש בינינו בית",
       "audio": "יש בנינו בית.mp3",
       "chart": "charts/יש בינינו בית.pdf",
-      "lyrics": null,
+      "lyrics": "lyrics/yesh-beineinu-bayit.txt",
       "bpm": 60
     },
     {
@@ -14,7 +14,7 @@
       "title": "Lost on You",
       "audio": "Lost on you.mp3",
       "chart": null,
-      "lyrics": null,
+      "lyrics": "lyrics/lost-on-you.txt",
       "bpm": 60
     },
     {
@@ -22,7 +22,7 @@
       "title": "עוד יהיה לי",
       "audio": "עוד יהיה לי.mp3",
       "chart": "charts/מעודכן_עוד יהיה לי.pdf",
-      "lyrics": null,
+      "lyrics": "lyrics/od-yihye-li.txt",
       "bpm": 60
     },
     {
@@ -30,7 +30,7 @@
       "title": "Let It Go",
       "audio": "Let it go.mp3",
       "chart": "charts/Let it Go.pdf",
-      "lyrics": null,
+      "lyrics": "lyrics/let-it-go.txt",
       "bpm": 60
     },
     {
@@ -38,7 +38,7 @@
       "title": "תל אביב בלילה",
       "audio": "תל אביב בלילה.mp3",
       "chart": "charts/תל אביב בלילה.pdf",
-      "lyrics": null,
+      "lyrics": "lyrics/tel-aviv-balayla.txt",
       "bpm": 60
     },
     {
@@ -46,7 +46,7 @@
       "title": "שיר הסמרטוטים",
       "audio": "שיר הסמרטוטים.mp3",
       "chart": "charts/סמרטוטים A-C.pdf",
-      "lyrics": null,
+      "lyrics": "lyrics/shir-hasmartutim.txt",
       "bpm": 60
     },
     {
@@ -54,7 +54,7 @@
       "title": "Larger Than Life",
       "audio": "Larger than life.mp3",
       "chart": "charts/מעודכן_Larger Than Life.pdf",
-      "lyrics": null,
+      "lyrics": "lyrics/larger-than-life.txt",
       "bpm": 60
     },
     {
@@ -62,7 +62,7 @@
       "title": "דאווינים",
       "audio": "דאווינים.mp3",
       "chart": "charts/דאווינים.pdf",
-      "lyrics": null,
+      "lyrics": "lyrics/dawinim.txt",
       "bpm": 60
     },
     {
@@ -70,7 +70,7 @@
       "title": "רגע פרטי",
       "audio": "רגע פרטי.mp3",
       "chart": null,
-      "lyrics": null,
+      "lyrics": "lyrics/rega-prati.txt",
       "bpm": 60
     },
     {
@@ -78,7 +78,7 @@
       "title": "האיש ההוא",
       "audio": "האיש ההוא.mp3",
       "chart": null,
-      "lyrics": null,
+      "lyrics": "lyrics/haish-hahu.txt",
       "bpm": 60
     },
     {
@@ -86,7 +86,7 @@
       "title": "Dance Monkey",
       "audio": "dance monkey.mp3",
       "chart": "charts/Dance Monkey.pdf",
-      "lyrics": null,
+      "lyrics": "lyrics/dance-monkey.txt",
       "bpm": 60
     },
     {
@@ -94,7 +94,7 @@
       "title": "קוק בצהריים",
       "audio": "קוק בצהריים.mp3",
       "chart": "charts/קוק בצהריים.pdf",
-      "lyrics": null,
+      "lyrics": "lyrics/kok-batzohorayim.txt",
       "bpm": 60
     },
     {
@@ -102,7 +102,7 @@
       "title": "מירוץ החיים",
       "audio": "מירוץ החיים.mp3",
       "chart": null,
-      "lyrics": null,
+      "lyrics": "lyrics/merotz-hachaim.txt",
       "bpm": 60
     },
     {
@@ -110,7 +110,7 @@
       "title": "צל עץ תמר",
       "audio": "צל עץ תמר.mp3",
       "chart": null,
-      "lyrics": null,
+      "lyrics": "lyrics/tzel-etz-tamar.txt",
       "bpm": 60
     },
     {
@@ -118,7 +118,7 @@
       "title": "שתי משוגעות",
       "audio": "שתי משוגעות.mp3",
       "chart": "charts/שתי_משוגעות-מעודכן.pdf",
-      "lyrics": null,
+      "lyrics": "lyrics/shtei-meshugaot.txt",
       "bpm": 60
     },
     {
@@ -126,7 +126,7 @@
       "title": "שמחה לאד",
       "audio": "שמחה לאד.mp3",
       "chart": null,
-      "lyrics": null,
+      "lyrics": "lyrics/simcha-laad.txt",
       "bpm": 60
     }
   ]
