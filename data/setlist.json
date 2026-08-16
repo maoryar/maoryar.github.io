@@ -125,7 +125,7 @@
       "id": "simcha-laad",
       "title": "שמחה לאד",
       "audio": "שמחה לאד.mp3",
-      "chart": null,
+      "chart": "charts/Ed Sheeran - Shape of You.pdf",
       "lyrics": "lyrics/simcha-laad.txt",
       "bpm": 140
     }
