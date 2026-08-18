@@ -523,7 +523,62 @@
             touch-action: manipulation;
         }
 
-        .chart-frame-wrap iframe { flex: 1; width: 100%; height: 100%; border: none; }
+        /* Two chart renderers, picked per browser (see pickChartMode()):
+           - native <iframe>, where the engine has an inline PDF viewer
+           - PDF.js -> <canvas>, where it does not (Android Chromium)
+           Only one is ever visible. */
+        .chart-viewport {
+            flex: 1;
+            position: relative;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            background: #fff;
+        }
+
+        .chart-viewport > iframe {
+            display: none;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .chart-viewport.native > iframe { display: block; }
+        .chart-viewport.native { overflow: hidden; }
+        .chart-viewport.native > .chart-pages { display: none; }
+
+        .chart-pages {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 100%;
+            padding: 4px;
+        }
+
+        .chart-pages canvas {
+            display: block;
+            max-width: 100%;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+        }
+
+        .chart-state {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+            text-align: center;
+            padding: 1.5rem;
+            background: #fff;
+            color: #4b5563;
+            font-size: 0.95rem;
+        }
+
+        .chart-state.visible { display: flex; }
+        .chart-state.error { color: #b91c1c; }
 
         .chart-fallback {
             padding: 10px;
@@ -677,7 +732,11 @@
     <div class="modal" id="chart-modal" role="dialog" aria-modal="true" aria-label="אקורדים">
         <button class="modal-close" id="chart-close" aria-label="סגור">&times;</button>
         <div class="chart-frame-wrap">
-            <iframe id="chart-frame" title="אקורדים"></iframe>
+            <div class="chart-viewport" id="chart-viewport">
+                <iframe id="chart-frame" title="אקורדים"></iframe>
+                <div class="chart-pages" id="chart-pages"></div>
+                <div class="chart-state" id="chart-state"></div>
+            </div>
             <div class="chart-fallback">
                 <a id="chart-open" href="#" target="_blank" rel="noopener noreferrer">לא נטען? פתח את ה-PDF בלשונית חדשה</a>
             </div>
@@ -1090,16 +1149,220 @@
             rafId = requestAnimationFrame(frame);
         }
 
-        /* ---------- chart modal ---------- */
+        /* ---------- chart modal (PDF.js -> canvas) ---------- */
         var chartModal = document.getElementById('chart-modal');
+        var chartViewport = document.getElementById('chart-viewport');
         var chartFrame = document.getElementById('chart-frame');
+        var chartPages = document.getElementById('chart-pages');
+        var chartState = document.getElementById('chart-state');
         var chartOpen  = document.getElementById('chart-open');
+
+        /* Which renderer this browser gets.
+           Inline PDF support tracks the ENGINE + PLATFORM, not the brand:
+             - iOS/iPadOS: every browser is WebKit (Apple mandates it), and
+               WebKit always renders PDFs inline. Chrome on iPhone included.
+             - Android: Chromium ships no PDF viewer, so Chrome, Edge and
+               Samsung Internet all show a blank frame. This is the case
+               PDF.js exists for.
+             - Desktop: Chromium has PDFium and Firefox has pdf.js built in;
+               both render inline.
+           navigator.pdfViewerEnabled is the standardised signal and is
+           authoritative where present (Chromium 94+, Firefox 90+); the UA
+           sniff below is only the fallback for older//odd engines. */
+        function pickChartMode() {
+            var ua = navigator.userAgent || '';
+            var isIOS = /iPad|iPhone|iPod/.test(ua) ||
+                        // iPadOS 13+ reports as desktop Safari
+                        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            if (isIOS) return 'native';           // always WebKit, always inline
+
+            if (typeof navigator.pdfViewerEnabled === 'boolean') {
+                return navigator.pdfViewerEnabled ? 'native' : 'pdfjs';
+            }
+
+            if (/Android/.test(ua)) return 'pdfjs';
+            return 'native';                      // desktop engines render inline
+        }
+
+        var CHART_MODE = pickChartMode();
+
+        var PDFJS_VER = '3.11.174';   // UMD build: no ES-module requirement
+        var PDFJS_BASE = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/' + PDFJS_VER + '/';
+
+        var pdfjsPromise = null;      // resolves to the pdfjsLib namespace
+        var pdfDocCache = {};         // url -> Promise<PDFDocumentProxy>
+        var chartToken = 0;           // guards against out-of-order swipes
+        var renderTasks = [];         // in-flight page renders, cancellable
+
+        // Loaded on first chart open rather than at page load, so visitors who
+        // never open a chart don't pay for it.
+        function loadPdfJs() {
+            if (pdfjsPromise) return pdfjsPromise;
+
+            pdfjsPromise = new Promise(function (resolve, reject) {
+                var s = document.createElement('script');
+                s.src = PDFJS_BASE + 'pdf.min.js';
+                s.onload = function () {
+                    if (!window.pdfjsLib) { reject(new Error('pdfjsLib missing')); return; }
+                    window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_BASE + 'pdf.worker.min.js';
+                    resolve(window.pdfjsLib);
+                };
+                s.onerror = function () { reject(new Error('CDN unreachable')); };
+                document.head.appendChild(s);
+            });
+
+            // Let a failed load be retried on the next open.
+            pdfjsPromise.catch(function () { pdfjsPromise = null; });
+            return pdfjsPromise;
+        }
+
+        function chartMsg(text, isError) {
+            chartState.textContent = text;
+            chartState.className = 'chart-state visible' + (isError ? ' error' : '');
+        }
+
+        function chartMsgHide() { chartState.className = 'chart-state'; }
+
+        function cancelRenders() {
+            renderTasks.forEach(function (t) {
+                try { t.cancel(); } catch (e) { /* already settled */ }
+            });
+            renderTasks = [];
+        }
+
+        function getDoc(pdfjsLib, url) {
+            if (!pdfDocCache[url]) {
+                pdfDocCache[url] = pdfjsLib.getDocument({ url: url }).promise;
+                pdfDocCache[url].catch(function () { delete pdfDocCache[url]; });
+            }
+            return pdfDocCache[url];
+        }
 
         function renderChart(song) {
             var url = urlFor(song.chart);
-            chartFrame.src = url + '#view=Fit&toolbar=0&navpanes=0';
             chartOpen.href = url;
+
+            if (CHART_MODE === 'native') {
+                renderChartNative(url);
+            } else {
+                renderChartPdfJs(url);
+            }
         }
+
+        /* Native path: hand the URL to the engine's own PDF viewer.
+           No CORS requirement (an iframe is not a fetch), no CDN dependency,
+           and it keeps the viewer's own pinch/zoom. The #view=Fit hint is
+           honoured by Chromium and ignored by WebKit — deliberately left
+           as-is rather than worked around. */
+        function renderChartNative(url) {
+            chartToken++;               // invalidate any pending PDF.js work
+            cancelRenders();
+            chartPages.innerHTML = '';
+            chartMsgHide();
+            chartViewport.classList.add('native');
+            chartFrame.src = url + '#view=Fit&toolbar=0&navpanes=0';
+        }
+
+        function renderChartPdfJs(url) {
+            chartViewport.classList.remove('native');
+            chartFrame.removeAttribute('src');
+
+            var token = ++chartToken;
+            cancelRenders();
+            chartPages.innerHTML = '';
+            chartMsg('טוען אקורדים…', false);
+
+            loadPdfJs()
+                .catch(function (e) {
+                    throw new Error('טעינת ספריית PDF.js נכשלה — ' + e.message);
+                })
+                .then(function (pdfjsLib) {
+                    return getDoc(pdfjsLib, url).catch(function (e) {
+                        var detail = (e && (e.name ? e.name + ': ' : '') + (e.message || e)) || 'unknown';
+                        if (e && typeof e.status === 'number') detail += ' (HTTP ' + e.status + ')';
+                        throw new Error('קריאת קובץ ה-PDF נכשלה — ' + detail);
+                    });
+                })
+                .then(function (pdf) {
+                    if (token !== chartToken) return;   // superseded by a swipe
+                    return drawPages(pdf, token);
+                })
+                .catch(function (err) {
+                    if (token !== chartToken) return;
+                    chartMsg(err.message + ' · נסו לפתוח את ה-PDF בלשונית חדשה.', true);
+                    // Full object in the console for diagnosis.
+                    if (window.console) console.error('[chart]', url, err);
+                });
+        }
+
+        function drawPages(pdf, token) {
+            var cw = chartViewport.clientWidth;
+            var ch = chartViewport.clientHeight;
+            if (!cw || !ch) return;
+
+            var single = pdf.numPages === 1;
+            // Render above CSS size so pinch-zooming stays sharp.
+            var pixelScale = Math.min(3, (window.devicePixelRatio || 1) * 1.5);
+
+            var seq = Promise.resolve();
+            for (var p = 1; p <= pdf.numPages; p++) {
+                seq = seq.then(makePageStep(pdf, p, token, cw, ch, single, pixelScale));
+            }
+
+            return seq.then(function () {
+                if (token === chartToken) chartMsgHide();
+            });
+        }
+
+        function makePageStep(pdf, pageNum, token, cw, ch, single, pixelScale) {
+            return function () {
+                if (token !== chartToken) return;
+
+                return pdf.getPage(pageNum).then(function (page) {
+                    if (token !== chartToken) return;
+
+                    var base = page.getViewport({ scale: 1 });
+                    // Real page dimensions, so this is an exact fit: whole page
+                    // for a single-page chart, fit-to-width when it scrolls.
+                    var fit = single
+                        ? Math.min(cw / base.width, ch / base.height)
+                        : cw / base.width;
+
+                    var vp = page.getViewport({ scale: fit * pixelScale });
+                    var canvas = document.createElement('canvas');
+                    canvas.width = Math.floor(vp.width);
+                    canvas.height = Math.floor(vp.height);
+                    canvas.style.width = Math.floor(vp.width / pixelScale) + 'px';
+                    canvas.style.height = Math.floor(vp.height / pixelScale) + 'px';
+                    chartPages.appendChild(canvas);
+
+                    var task = page.render({
+                        canvasContext: canvas.getContext('2d'),
+                        viewport: vp
+                    });
+                    renderTasks.push(task);
+                    return task.promise.catch(function (e) {
+                        if (e && e.name === 'RenderingCancelledException') return;
+                        throw e;
+                    });
+                });
+            };
+        }
+
+        // Canvases are raster, so a resize needs a re-render, not a rescale.
+        // The native iframe reflows itself, so it needs nothing here.
+        var chartResizeTimer = null;
+        function reflowChart() {
+            if (CHART_MODE !== 'pdfjs') return;
+            if (activeKind !== 'chart' || activeIdx < 0) return;
+            clearTimeout(chartResizeTimer);
+            chartResizeTimer = setTimeout(function () {
+                if (activeKind === 'chart' && activeIdx >= 0) renderChart(songs[activeIdx]);
+            }, 200);
+        }
+
+        window.addEventListener('resize', reflowChart);
+        window.addEventListener('orientationchange', reflowChart);
 
         /* ---------- lyrics modal ----------
            Plain-text files fetched from S3 (needs bucket CORS). Results are
@@ -1181,8 +1444,10 @@
             activeKind = kind;
             activeIdx = idx;
 
-            cfg.render(songs[idx]);
+            // Activate before rendering: the chart fit needs real dimensions,
+            // and a display:none container measures 0.
             cfg.el.classList.add('active');
+            cfg.render(songs[idx]);
             updateNav();
         }
 
@@ -1192,7 +1457,13 @@
             cfg.el.classList.remove('active');
 
             if (activeKind === 'bpm') stopBpmLoop();
-            if (activeKind === 'chart') chartFrame.src = '';  // stop rendering / free memory
+            if (activeKind === 'chart') {
+                chartToken++;          // invalidate any in-flight load
+                cancelRenders();
+                chartPages.innerHTML = '';   // free canvas memory
+                chartFrame.removeAttribute('src');   // stop the native viewer
+                chartMsgHide();
+            }
 
             activeKind = null;
             activeIdx = -1;
