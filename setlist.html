@@ -692,10 +692,12 @@
 
         .lyrics-body {
             overflow-y: auto;
-            white-space: pre-wrap;
+            white-space: pre-line !important;
             word-break: break-word;
             line-height: 1.85;
             font-size: 1.05rem;
+            text-align: right;
+            direction: rtl;
             -webkit-overflow-scrolling: touch;
         }
 
@@ -1475,6 +1477,7 @@
 
             if (Object.prototype.hasOwnProperty.call(lyricsCache, song.id)) {
                 lyricsBody.className = 'lyrics-body';
+                lyricsBody.style.whiteSpace = 'pre-line';
                 lyricsBody.textContent = lyricsCache[song.id];
                 return;
             }
@@ -1495,6 +1498,7 @@
                     lyricsCache[song.id] = text;
                     if (token !== lyricsReq) return;
                     lyricsBody.className = 'lyrics-body';
+                    lyricsBody.style.whiteSpace = 'pre-line';
                     lyricsBody.textContent = text;
                     lyricsBody.scrollTop = 0;
                 })
