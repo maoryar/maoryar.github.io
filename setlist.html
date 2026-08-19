@@ -1180,7 +1180,7 @@
                 return navigator.pdfViewerEnabled ? 'native' : 'pdfjs';
             }
 
-            if (/Android/.test(ua)) return 'pdfjs';
+            if (/Android/.test(ua)) return 'native';
             return 'native';                      // desktop engines render inline
         }
 
@@ -1260,7 +1260,11 @@
             chartPages.innerHTML = '';
             chartMsgHide();
             chartViewport.classList.add('native');
-            chartFrame.src = url + '#view=Fit&toolbar=0&navpanes=0';
+            if (/Android/i.test(navigator.userAgent)) {
+                chartFrame.src = 'https://docs.google.com/viewer?url=' + encodeURIComponent(url) + '&embedded=true';
+            } else {
+                chartFrame.src = url + '#view=Fit&toolbar=0&navpanes=0';
+            }
         }
 
         function renderChartPdfJs(url) {
