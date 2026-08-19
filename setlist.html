@@ -510,18 +510,52 @@
         /* Chart (PDF) modal */
         .chart-frame-wrap {
             width: min(96vw, 900px);
-            /* Fills the space the modal leaves above the nav pill, rather than a
-               fixed vh that would sit under it. */
-            height: 100%;
-            max-height: 1000px;
-            background: #fff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
-            display: flex;
-            flex-direction: column;
-            touch-action: manipulation;
-        }
+            /* Chart (PDF / Image) modal */
+            .chart-frame-wrap {
+                width: min(96vw, 900px);
+                height: min(92vh, 1000px);
+                background: #fff;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+                display: flex;
+                flex-direction: column;
+                touch-action: manipulation;
+            }
+
+            #chart-img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+                display: block;
+                margin: auto;
+                border-radius: 4px;
+                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+                touch-action: manipulation;
+            }
+
+            .chart-viewport.is-img iframe,
+            .chart-viewport.is-img .chart-pages,
+            .chart-viewport.is-img .chart-state {
+                display: none !important;
+            }
+
+            .chart-viewport.is-img {
+                display: flex !important;
+                justify-content: center;
+                align-items: center;
+                background: #ffffff;
+                padding: 8px;
+                overflow: auto;
+            }
+
+            .chart-viewport.is-img #chart-img {
+                display: block !important;
+            }
+
+            .chart-viewport:not(.is-img) #chart-img {
+                display: none !important;
+            }
 
         /* Two chart renderers, picked per browser (see pickChartMode()):
            - native <iframe>, where the engine has an inline PDF viewer
@@ -728,17 +762,18 @@
         </div>
     </div>
 
-    <!-- Chart (PDF) viewer -->
+    <!-- Chart (PDF / Image) viewer -->
     <div class="modal" id="chart-modal" role="dialog" aria-modal="true" aria-label="אקורדים">
         <button class="modal-close" id="chart-close" aria-label="סגור">&times;</button>
         <div class="chart-frame-wrap">
             <div class="chart-viewport" id="chart-viewport">
+                <img id="chart-img" alt="אקורדים" />
                 <iframe id="chart-frame" title="אקורדים"></iframe>
                 <div class="chart-pages" id="chart-pages"></div>
                 <div class="chart-state" id="chart-state"></div>
             </div>
             <div class="chart-fallback">
-                <a id="chart-open" href="#" target="_blank" rel="noopener noreferrer">לא נטען? פתח את ה-PDF בלשונית חדשה</a>
+                <a id="chart-open" href="#" target="_blank" rel="noopener noreferrer">פתח את הקובץ בלשונית חדשה ↗</a>
             </div>
         </div>
     </div>
@@ -1242,9 +1277,20 @@
             var url = urlFor(song.chart);
             chartOpen.href = url;
 
-            if (CHART_MODE === 'native') {
+            if (/\.(png|webp|jpg|jpeg)$/i.test(song.chart)) {
+                chartToken++;
+                cancelRenders();
+                chartPages.innerHTML = '';
+                chartMsgHide();
+                chartViewport.classList.add('is-img');
+                chartViewport.classList.remove('native');
+                var chartImg = document.getElementById('chart-img');
+                chartImg.src = url;
+            } else if (CHART_MODE === 'native') {
+                chartViewport.classList.remove('is-img');
                 renderChartNative(url);
             } else {
+                chartViewport.classList.remove('is-img');
                 renderChartPdfJs(url);
             }
         }

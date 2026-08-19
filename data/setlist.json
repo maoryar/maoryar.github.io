@@ -5,7 +5,7 @@
       "id": "yesh-beineinu-bayit",
       "title": "יש בינינו בית",
       "audio": "יש בנינו בית.mp3",
-      "chart": "charts/יש בינינו בית.pdf",
+      "chart": "charts/יש בינינו בית.png",
       "lyrics": "lyrics/yesh-beineinu-bayit.txt",
       "bpm": 82
     },
@@ -21,7 +21,7 @@
       "id": "od-yihye-li",
       "title": "עוד יהיה לי",
       "audio": "עוד יהיה לי.mp3",
-      "chart": "charts/מעודכן_עוד יהיה לי.pdf",
+      "chart": "charts/מעודכן_עוד יהיה לי.png",
       "lyrics": "lyrics/od-yihye-li.txt",
       "bpm": 118
     },
@@ -29,7 +29,7 @@
       "id": "let-it-go",
       "title": "Let It Go",
       "audio": "Let it go.mp3",
-      "chart": "charts/Let it Go.pdf",
+      "chart": "charts/Let it Go.png",
       "lyrics": "lyrics/let-it-go.txt",
       "bpm": 137
     },
@@ -37,7 +37,7 @@
       "id": "tel-aviv-balayla",
       "title": "תל אביב בלילה",
       "audio": "תל אביב בלילה.mp3",
-      "chart": "charts/תל אביב בלילה.pdf",
+      "chart": "charts/תל אביב בלילה.png",
       "lyrics": "lyrics/tel-aviv-balayla.txt",
       "bpm": 128
     },
@@ -45,7 +45,7 @@
       "id": "shir-hasmartutim",
       "title": "שיר הסמרטוטים",
       "audio": "שיר הסמרטוטים.mp3",
-      "chart": "charts/סמרטוטים A-C.pdf",
+      "chart": "charts/סמרטוטים A-C.png",
       "lyrics": "lyrics/shir-hasmartutim.txt",
       "bpm": 112
     },
@@ -53,7 +53,7 @@
       "id": "larger-than-life",
       "title": "Larger Than Life",
       "audio": "Larger than life.mp3",
-      "chart": "charts/מעודכן_Larger Than Life.pdf",
+      "chart": "charts/מעודכן_Larger Than Life.png",
       "lyrics": "lyrics/larger-than-life.txt",
       "bpm": 108
     },
@@ -61,7 +61,7 @@
       "id": "dawinim",
       "title": "דאווינים",
       "audio": "דאווינים.mp3",
-      "chart": "charts/דאווינים.pdf",
+      "chart": "charts/דאווינים.png",
       "lyrics": "lyrics/dawinim.txt",
       "bpm": 125
     },
@@ -69,7 +69,7 @@
       "id": "rega-prati",
       "title": "רגע פרטי",
       "audio": "רגע פרטי.mp3",
-      "chart": "charts/רגע פרטי G 3.pdf",
+      "chart": "charts/רגע פרטי G 3.png",
       "lyrics": "lyrics/rega-prati.txt",
       "bpm": 76
     },
@@ -77,7 +77,7 @@
       "id": "haish-hahu",
       "title": "האיש ההוא",
       "audio": "האיש ההוא.mp3",
-      "chart": "charts/האיש ההוא 2.pdf",
+      "chart": "charts/האיש ההוא 2.png",
       "lyrics": "lyrics/haish-hahu.txt",
       "bpm": 88
     },
@@ -85,7 +85,7 @@
       "id": "dance-monkey",
       "title": "Dance Monkey",
       "audio": "dance monkey.mp3",
-      "chart": "charts/Dance Monkey.pdf",
+      "chart": "charts/Dance Monkey.png",
       "lyrics": "lyrics/dance-monkey.txt",
       "bpm": 98
     },
@@ -93,7 +93,7 @@
       "id": "kok-batzohorayim",
       "title": "קוק בצהריים",
       "audio": "קוק בצהריים.mp3",
-      "chart": "charts/קוק בצהריים.pdf",
+      "chart": "charts/קוק בצהריים.png",
       "lyrics": "lyrics/kok-batzohorayim.txt",
       "bpm": 132
     },
@@ -101,7 +101,7 @@
       "id": "merotz-hachaim",
       "title": "מירוץ החיים",
       "audio": "מירוץ החיים.mp3",
-      "chart": "charts/מירוץ החיים 3.pdf",
+      "chart": "charts/מירוץ החיים 3.png",
       "lyrics": "lyrics/merotz-hachaim.txt",
       "bpm": 122
     },
@@ -117,7 +117,7 @@
       "id": "shtei-meshugaot",
       "title": "שתי משוגעות",
       "audio": "שתי משוגעות.mp3",
-      "chart": "charts/שתי_משוגעות-מעודכן.pdf",
+      "chart": "charts/שתי_משוגעות-מעודכן.png",
       "lyrics": "lyrics/shtei-meshugaot.txt",
       "bpm": 126
     },
@@ -125,7 +125,7 @@
       "id": "simcha-laad",
       "title": "שמחה לאד",
       "audio": "שמחה לאד.mp3",
-      "chart": "charts/Ed Sheeran - Shape of You.pdf",
+      "chart": "charts/Ed Sheeran - Shape of You.png",
       "lyrics": "lyrics/simcha-laad.txt",
       "bpm": 140
     }
