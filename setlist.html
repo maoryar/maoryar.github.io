@@ -65,19 +65,30 @@
         }
 
         .back-link {
-            display: inline-block;
-            margin-top: 0.8rem;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 0.9rem;
-            padding: 6px 16px;
-            border-radius: 30px;
-            background: rgba(255, 255, 255, 0.05);
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: rgba(255, 255, 255, 0.06);
             border: 1px solid var(--glass-border);
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
         }
 
-        .back-link:hover { color: #fff; background: rgba(255, 255, 255, 0.12); }
+        .back-link:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
 
         main {
             flex: 1;
@@ -88,17 +99,57 @@
         }
 
         /* Toolbar */
-        /* Version selector dropdown */
-        .version-select-wrap {
+        .toolbar {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 8px;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .play-all-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            height: 38px;
+            padding: 0 16px;
+            border-radius: 20px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(230, 104, 60, 0.3);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+
+        .play-all-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .version-select-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
-            padding: 4px 12px;
-            height: 36px;
+            padding: 0 12px;
+            height: 38px;
             transition: all 0.2s ease;
+            box-sizing: border-box;
+            flex-shrink: 0;
         }
 
         .version-select-wrap:hover {
@@ -131,61 +182,44 @@
             padding: 8px 12px;
         }
 
-        .toolbar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .play-all-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--accent-color);
-            color: #fff;
-            border: none;
-            padding: 10px 22px;
-            border-radius: 50px;
-            font-family: inherit;
-            font-weight: 700;
-            font-size: 0.98rem;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(230, 104, 60, 0.3);
-            transition: all 0.25s ease;
-        }
-
-        .play-all-btn:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
-        }
-
         .icon-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid var(--glass-border);
             color: var(--text-muted);
-            border-radius: 50px;
-            padding: 9px 16px;
+            border-radius: 20px;
+            height: 38px;
+            width: 38px;
+            padding: 0;
             font-family: inherit;
             font-size: 0.88rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
+            flex-shrink: 0;
+            box-sizing: border-box;
+            position: relative;
         }
 
-        .icon-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.14); }
-
-        /* Repeat button lights up when a mode is active */
+        .icon-btn:hover,
         .icon-btn.repeat-on {
             color: var(--accent-hover);
             border-color: rgba(230, 104, 60, 0.5);
+            background: rgba(230, 104, 60, 0.1);
+        }
+
+        .repeat-badge {
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            font-size: 0.68rem;
+            font-weight: 900;
+            color: var(--accent-hover);
+            line-height: 1;
+        }
             background: rgba(230, 104, 60, 0.12);
         }
 
@@ -789,17 +823,17 @@
 </head>
 <body>
 
-    <header>
+    <header style="position: relative;">
+        <a href="index.html" class="back-link" title="חזרה לעמוד הראשי" aria-label="חזרה לעמוד הראשי">&#8594;</a>
         <h1 class="band-logo">חוגזי</h1>
         <p class="band-subtitle">סטליסט • הקלטות, אקורדים וקצב</p>
-        <a href="index.html" class="back-link">&#8594; חזרה לעמוד הראשי</a>
     </header>
 
     <main>
         <div class="toolbar">
             <button class="play-all-btn" id="play-all">
-                <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                נגן את כל הסט
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                נגן הכל
             </button>
 
             <!-- Version Selector Dropdown -->
@@ -815,18 +849,15 @@
                 </select>
             </div>
 
-            <button class="icon-btn" id="repeat-btn" aria-pressed="false">
+            <button class="icon-btn" id="repeat-btn" aria-pressed="false" title="ללא חזרה">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="17 1 21 5 17 9"/>
                     <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
                     <polyline points="7 23 3 19 7 15"/>
                     <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
                 </svg>
-                <span id="repeat-label">ללא חזרה</span>
                 <span class="repeat-badge" id="repeat-badge"></span>
             </button>
-
-            <span class="count" id="count"></span>
         </div>
 
         <ul class="song-list" id="song-list"></ul>
@@ -1183,10 +1214,10 @@
         function cycleRepeat() {
             repeatIdx = (repeatIdx + 1) % REPEAT_MODES.length;
             var mode = REPEAT_MODES[repeatIdx];
-            repeatLbl.textContent = mode.label;
-            repeatBdg.textContent = mode.badge;
+            if (repeatBdg) repeatBdg.textContent = mode.badge;
             repeatBtn.classList.toggle('repeat-on', mode.id !== 'off');
             repeatBtn.setAttribute('aria-pressed', mode.id !== 'off' ? 'true' : 'false');
+            repeatBtn.setAttribute('title', mode.label);
         }
 
         audio.addEventListener('timeupdate', function () {
