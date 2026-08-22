@@ -88,6 +88,49 @@
         }
 
         /* Toolbar */
+        /* Version selector dropdown */
+        .version-select-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 4px 12px;
+            height: 36px;
+            transition: all 0.2s ease;
+        }
+
+        .version-select-wrap:hover {
+            border-color: rgba(230, 104, 60, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .version-label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .version-select {
+            background: transparent;
+            border: none;
+            color: var(--accent-hover);
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            outline: none;
+            direction: rtl;
+        }
+
+        .version-select option {
+            background: #16181f;
+            color: #f3f4f6;
+            padding: 8px 12px;
+        }
+
         .toolbar {
             display: flex;
             align-items: center;
@@ -759,6 +802,19 @@
                 נגן את כל הסט
             </button>
 
+            <!-- Version Selector Dropdown -->
+            <div class="version-select-wrap">
+                <label for="version-select" class="version-label">גרסה:</label>
+                <select id="version-select" class="version-select" aria-label="בחר גרסת השמעה">
+                    <option value="original" selected>🎵 מקור</option>
+                    <option value="novocals">🎤 קריוקי / פלייבק</option>
+                    <option value="bassboost">🎸 בס מוגבר</option>
+                    <option value="keysboost">🎹 קלידים מוגברים</option>
+                    <option value="guitarboost">🎸 גיטרה מוגברת</option>
+                    <option value="drumsboost">🥁 תופים מוגברים</option>
+                </select>
+            </div>
+
             <button class="icon-btn" id="repeat-btn" aria-pressed="false">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="17 1 21 5 17 9"/>
@@ -1040,11 +1096,22 @@
 
         /* ---------- playback ---------- */
 
+        var currentVersion = 'original';
+
+        function getAudioUrl(song) {
+            if (!song) return '';
+            if (currentVersion === 'original') {
+                return urlFor(song.audio);
+            }
+            return baseUrl + 'remixes/' + song.id + '_' + currentVersion + '.mp3';
+        }
+
         function loadSong(i, autoplay) {
             if (i < 0 || i >= songs.length) return;
-            if (current !== i) {
+            var targetUrl = getAudioUrl(songs[i]);
+            if (current !== i || audio.src !== targetUrl) {
                 current = i;
-                audio.src = urlFor(songs[i].audio);
+                audio.src = targetUrl;
                 paintActive();
             }
             if (autoplay) {
@@ -1148,7 +1215,7 @@
            <a download> would just navigate to the MP3. Fetch to a blob instead
            (needs CORS on the bucket) and fall back to opening the URL. */
         function download(song, btn) {
-            var url = urlFor(song.audio);
+            var url = getAudioUrl(song);
             btn.setAttribute('aria-busy', 'true');
 
             fetch(url)
@@ -1671,6 +1738,19 @@
         document.getElementById('bpm-close').addEventListener('click', closeModal);
         document.getElementById('chart-close').addEventListener('click', closeModal);
         document.getElementById('lyrics-close').addEventListener('click', closeModal);
+
+        document.getElementById('version-select').addEventListener('change', function () {
+            currentVersion = this.value;
+            if (current >= 0) {
+                var currentTime = audio.currentTime;
+                var isPlaying = !audio.paused;
+                audio.src = getAudioUrl(songs[current]);
+                audio.currentTime = currentTime;
+                if (isPlaying) {
+                    audio.play().catch(function (err) { console.error(err); });
+                }
+            }
+        });
 
         Object.keys(MODALS).forEach(function (kind) {
             MODALS[kind].el.addEventListener('click', function (e) {
