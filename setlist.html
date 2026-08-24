@@ -749,7 +749,7 @@
         /* Lyrics modal */
         .lyrics-box {
             width: min(94vw, 620px);
-            max-height: min(85vh, 750px);
+            max-height: 80vh;
             background: var(--card-bg);
             border: 1px solid var(--glass-border);
             border-radius: 14px;
@@ -759,6 +759,7 @@
             box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
             overflow: hidden;
             box-sizing: border-box;
+            position: relative;
         }
 
         .lyrics-title {
@@ -771,6 +772,7 @@
 
         .lyrics-body {
             flex: 1 1 auto;
+            min-height: 0;
             overflow-y: auto;
             white-space: pre-line !important;
             word-break: break-word;
