@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>חוגזי | Choogzi - הופעות חיות וגלרייה</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0d0e12;
+            --card-bg: #16181f;
+            --accent-color: #e6683c;
+            --accent-hover: #ff7b4d;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --insta-grad: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            --glass-bg: rgba(22, 24, 31, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(220, 39, 67, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(188, 24, 136, 0.08) 0%, transparent 40%);
+        }
+
+        /* Header / Hero */
+        header {
+            padding: 4rem 1.5rem 2.5rem;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
+        }
+
+        .band-logo {
+            font-size: 4.5rem;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, #ffffff 30%, #9ca3af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .band-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            margin-bottom: 2rem;
+        }
+
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .insta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--insta-grad);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 12px 26px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 4px 25px rgba(220, 39, 67, 0.35);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .insta-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 35px rgba(220, 39, 67, 0.55);
+        }
+
+        .yt-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #FF0000;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 12px 26px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 4px 25px rgba(255, 0, 0, 0.35);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .yt-btn:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 8px 35px rgba(255, 0, 0, 0.55);
+            background: #e60000;
+        }
+
+        .insta-btn svg, .yt-btn svg, .yt-playlist-btn svg, .contact-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        /* Main Container */
+        main {
+            flex: 1;
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 1.5rem 4rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Carousel Navigation Controls */
+        .carousel-nav-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+            user-select: none;
+        }
+
+        .carousel-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.08);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .carousel-arrows {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Horizontal Scroll Carousel */
+        .carousel-wrapper {
+            position: relative;
+            margin-bottom: 4rem;
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            padding: 10px 4px 20px 4px;
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.2) transparent;
+        }
+
+        .carousel-track::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .carousel-track::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.02);
+            border-radius: 10px;
+        }
+
+        .carousel-track::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.15);
+            border-radius: 10px;
+        }
+
+        .carousel-track::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .carousel-item {
+            flex: 0 0 auto;
+            width: 320px;
+            height: 260px;
+            scroll-snap-align: start;
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--card-bg);
+            cursor: pointer;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .carousel-item:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .carousel-item:hover img {
+            transform: scale(1.06);
+        }
+
+        .zoom-icon {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 36px;
+            height: 36px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .carousel-item:hover .zoom-icon {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        /* Video Section */
+        .video-section {
+            margin-bottom: 4rem;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            border: 1px solid var(--glass-border);
+            background: #000;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .more-videos {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .yt-playlist-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 12px 24px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.25s ease;
+        }
+
+        .yt-playlist-btn:hover {
+            color: #fff;
+            background: rgba(255,0,0,0.2);
+            border-color: rgba(255,0,0,0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(230, 104, 60, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .contact-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-sub {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .contact-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.25s ease;
+        }
+
+        .contact-btn:hover {
+            background: #ffffff;
+            color: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Lightbox Modal */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 6, 8, 0.95);
+            z-index: 1000;
+            backdrop-filter: blur(15px);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            user-select: none;
+        }
+
+        .lightbox.active {
+            display: flex;
+            animation: fadeIn 0.25s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 85vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lightbox-img {
+            max-width: 100%;
+            max-height: 85vh;
+            border-radius: 12px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+            object-fit: contain;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .lb-btn {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+            z-index: 1010;
+        }
+
+        .lb-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.1);
+        }
+
+        .lb-close {
+            top: 25px;
+            left: 25px;
+        }
+
+        .lb-prev {
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .lb-next {
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .lb-prev:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .lb-next:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .lb-counter {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .band-logo {
+                font-size: 3.2rem;
+            }
+
+            .carousel-item {
+                width: 260px;
+                height: 210px;
+            }
+
+            .lb-prev { right: 10px; }
+            .lb-next { left: 10px; }
+        }
+
+        @media (max-width: 480px) {
+            .band-logo {
+                font-size: 2.5rem;
+            }
+
+            .carousel-item {
+                width: 220px;
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1 class="band-logo">חוגזי</h1>
+        <p class="band-subtitle">תמונות מההופעה האחרונה • רגעים מהבמה</p>
+        
+        <div class="social-buttons">
+            <a href="https://www.instagram.com/choogzi?igsh=MWs2Nnl0eXBmcjlxZg==" target="_blank" rel="noopener noreferrer" class="insta-btn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+                אינסטגרם
+            </a>
+
+            <a href="https://youtube.com/playlist?list=PLPj09wFJNFpYgmu6w5YVlObxvA_Ni5OAb&si=axqIDgFxTZqVbGwa" target="_blank" rel="noopener noreferrer" class="yt-btn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 0 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+                ערוץ ה-YouTube
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Horizontal Carousel Gallery Section -->
+        <section class="carousel-wrapper">
+            <div class="section-header">
+                <h2 class="section-title">גלריית תמונות מההופעה</h2>
+                <div class="carousel-arrows">
+                    <button class="carousel-nav-btn" onclick="scrollCarousel(1)">&#10095;</button>
+                    <button class="carousel-nav-btn" onclick="scrollCarousel(-1)">&#10094;</button>
+                </div>
+            </div>
+
+            <div class="carousel-track" id="carousel-track">
+                <!-- Dynamic Carousel Items -->
+            </div>
+        </section>
+
+        <!-- Past Shows Section -->
+        <section class="video-section">
+            <h2 class="section-title">הופעות קודמות</h2>
+            <div class="video-container">
+                <iframe 
+                    src="https://www.youtube.com/embed/y6Sfx8qN6NE" 
+                    title="חוגזי - הופעה חיה" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+            <div class="more-videos">
+                <a href="https://youtube.com/playlist?list=PLPj09wFJNFpYgmu6w5YVlObxvA_Ni5OAb&si=axqIDgFxTZqVbGwa" target="_blank" rel="noopener noreferrer" class="yt-playlist-btn">
+                    <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 0 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    לצפייה בכל סרטוני ההופעות בפלייליסט ב-YouTube
+                </a>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <h2 class="contact-title">צור קשר והזמנת הופעות</h2>
+            <p class="contact-sub">רוצים להזמין את חוגזי להופעה או ליצור איתנו קשר?</p>
+            <div class="contact-buttons">
+                <a href="https://www.instagram.com/choogzi?igsh=MWs2Nnl0eXBmcjlxZg==" target="_blank" rel="noopener noreferrer" class="contact-btn">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                    שלחו לנו הודעה באינסטגרם
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox" id="lightbox">
+        <button class="lb-btn lb-close" onclick="closeLightbox()">&times;</button>
+        <button class="lb-btn lb-prev" onclick="navigateLightbox(1)">&#10095;</button>
+        <button class="lb-btn lb-next" onclick="navigateLightbox(-1)">&#10094;</button>
+        
+        <div class="lb-counter" id="lb-counter">1 / 19</div>
+        
+        <div class="lightbox-content">
+            <img id="lb-img" class="lightbox-img" src="" alt="תמונה מגדלת">
+        </div>
+    </div>
+
+    <footer>
+        &copy; <span id="year"></span> חוגזי • Choogzi - כל הזכויות שמורות
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // 19 Image URLs from S3
+        const galleryData = [
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-8.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-14.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-7.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-5.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-11.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-1.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-15.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-9.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-2.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-12.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-18.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-3.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-16.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-4.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-13.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-17.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-6.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-10.jpg',
+            'https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi-live-19.jpg'
+        ];
+
+        let currentIndex = 0;
+        const track = document.getElementById('carousel-track');
+
+        function renderCarousel() {
+            track.innerHTML = '';
+            
+            galleryData.forEach((src, index) => {
+                const item = document.createElement('div');
+                item.className = 'carousel-item';
+                item.onclick = () => openLightbox(index);
+                
+                item.innerHTML = `
+                    <img src="${src}" alt="חוגזי בהופעה ${index + 1}" loading="lazy">
+                    <div class="zoom-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            <line x1="11" y1="8" x2="11" y2="14"/>
+                            <line x1="8" y1="11" x2="14" y2="11"/>
+                        </svg>
+                    </div>
+                `;
+                track.appendChild(item);
+            });
+        }
+
+        function scrollCarousel(direction) {
+            const scrollAmount = 340 * 2; // scroll 2 items width
+            track.scrollBy({ left: -direction * scrollAmount, behavior: 'smooth' });
+        }
+
+        /* Lightbox Functions */
+        function openLightbox(index) {
+            currentIndex = index;
+            updateLightbox();
+            const lb = document.getElementById('lightbox');
+            lb.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function navigateLightbox(direction) {
+            currentIndex += direction;
+            if (currentIndex < 0) currentIndex = galleryData.length - 1;
+            if (currentIndex >= galleryData.length) currentIndex = 0;
+            updateLightbox();
+        }
+
+        function updateLightbox() {
+            document.getElementById('lb-img').src = galleryData[currentIndex];
+            document.getElementById('lb-counter').textContent = `${currentIndex + 1} / ${galleryData.length}`;
+        }
+
+        /* Keyboard Shortcuts */
+        document.addEventListener('keydown', (e) => {
+            const lb = document.getElementById('lightbox');
+            if (!lb.classList.contains('active')) return;
+            
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') navigateLightbox(-1);
+            if (e.key === 'ArrowRight') navigateLightbox(1);
+        });
+
+        // Initialize
+        renderCarousel();
+    </script>
+</body>
+</html>

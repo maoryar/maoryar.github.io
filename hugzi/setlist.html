@@ -1841,11 +1841,11 @@
                 'background:rgba(255,255,255,0.08);border-radius:6px;direction:ltr">' +
                 'python3 -m http.server 8000</code><br>' +
                 '<span style="font-size:0.85rem">ואז לפתוח ' +
-                '<span style="direction:ltr;display:inline-block">http://localhost:8000/setlist.html</span></span>';
+                '<span style="direction:ltr;display:inline-block">http://localhost:8000/hugzi/setlist.html</span></span>';
             return;
         }
 
-        fetch('data/setlist.json?v=' + Date.now())
+        fetch('../data/setlist.json?v=' + Date.now())
             .then(function (res) {
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 return res.json();
@@ -1863,7 +1863,7 @@
                 stateEl.className = 'state-msg error';
                 stateEl.textContent =
                     'לא ניתן לטעון את הסטליסט: ' + err.message +
-                    ' — ודאו שהקובץ data/setlist.json קיים ונגיש.';
+                    ' — ודאו שהקובץ data/setlist.json קיים ונגיש בתיקיית השורש.';
             });
     })();
     </script>
