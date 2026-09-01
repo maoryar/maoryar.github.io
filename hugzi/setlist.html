@@ -220,8 +220,6 @@
             color: var(--accent-hover);
             line-height: 1;
         }
-            background: rgba(230, 104, 60, 0.12);
-        }
 
         .repeat-badge {
             font-size: 0.72rem;
@@ -630,55 +628,54 @@
 
         .bpm-hint { color: var(--text-muted); font-size: 0.85rem; margin-top: 1.4rem; }
 
-        /* Chart (PDF) modal */
+        /* Chart (PDF / Image) modal */
         .chart-frame-wrap {
             width: min(96vw, 900px);
-            /* Chart (PDF / Image) modal */
-            .chart-frame-wrap {
-                width: min(96vw, 900px);
-                height: min(92vh, 1000px);
-                background: #fff;
-                border-radius: 12px;
-                overflow: hidden;
-                box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
-                display: flex;
-                flex-direction: column;
-                touch-action: manipulation;
-            }
+            height: min(92vh, 1000px);
+            max-height: 100%;
+            max-width: 100%;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            touch-action: manipulation;
+        }
 
-            #chart-img {
-                max-width: 100%;
-                max-height: 100%;
-                object-fit: contain;
-                display: block;
-                margin: auto;
-                border-radius: 4px;
-                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-                touch-action: manipulation;
-            }
+        #chart-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+            margin: auto;
+            border-radius: 4px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            touch-action: manipulation;
+        }
 
-            .chart-viewport.is-img iframe,
-            .chart-viewport.is-img .chart-pages,
-            .chart-viewport.is-img .chart-state {
-                display: none !important;
-            }
+        .chart-viewport.is-img iframe,
+        .chart-viewport.is-img .chart-pages,
+        .chart-viewport.is-img .chart-state {
+            display: none !important;
+        }
 
-            .chart-viewport.is-img {
-                display: flex !important;
-                justify-content: center;
-                align-items: center;
-                background: #ffffff;
-                padding: 8px;
-                overflow: auto;
-            }
+        .chart-viewport.is-img {
+            display: flex !important;
+            justify-content: center;
+            align-items: center;
+            background: #ffffff;
+            padding: 8px;
+            overflow: auto;
+        }
 
-            .chart-viewport.is-img #chart-img {
-                display: block !important;
-            }
+        .chart-viewport.is-img #chart-img {
+            display: block !important;
+        }
 
-            .chart-viewport:not(.is-img) #chart-img {
-                display: none !important;
-            }
+        .chart-viewport:not(.is-img) #chart-img {
+            display: none !important;
+        }
 
         /* Two chart renderers, picked per browser (see pickChartMode()):
            - native <iframe>, where the engine has an inline PDF viewer
@@ -749,8 +746,13 @@
         /* Lyrics modal */
         .lyrics-box {
             width: min(94vw, 620px);
+            /* Explicit height keeps iOS flex scrolling working; max-height caps it
+               to the modal's real padded area so the box can never be flex-centered
+               off-screen when the mobile URL bar shrinks the visible viewport
+               (vh tracks the large viewport, the fixed modal tracks the small one). */
             height: min(78vh, 680px);
-            max-height: 78vh;
+            max-height: 100%;
+            max-width: 100%;
             background: var(--card-bg);
             border: 1px solid var(--glass-border);
             border-radius: 14px;
@@ -957,7 +959,6 @@
         var audio      = document.getElementById('audio');
         var listEl     = document.getElementById('song-list');
         var stateEl    = document.getElementById('state');
-        var countEl    = document.getElementById('count');
         var player     = document.getElementById('player');
         var pTitle     = document.getElementById('p-title');
         var pTime      = document.getElementById('p-time');
@@ -1141,7 +1142,6 @@
                 rows.push({ li: li, playBtn: playBtn, seek: seek });
             });
 
-            countEl.textContent = songs.length + ' שירים';
             stateEl.style.display = 'none';
         }
 
