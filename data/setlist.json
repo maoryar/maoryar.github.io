@@ -1,4 +1,13 @@
 {
   "baseUrl": "https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi_setlist/",
-  "songs": []
+  "songs": [
+    {
+      "id": "ad-hakatze",
+      "title": "עד הקצה",
+      "audio": null,
+      "chart": "charts/ad-hakatze.png",
+      "lyrics": "lyrics/ad-hakatze.txt",
+      "bpm": 96
+    }
+  ]
 }
