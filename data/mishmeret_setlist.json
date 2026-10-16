@@ -1,4 +1,13 @@
 {
-  "baseUrl": "",
-  "songs": []
+  "baseUrl": "https://maoryaron-webpage-storage.s3.eu-north-1.amazonaws.com/choogzi_setlist/mishmeret/",
+  "songs": [
+    {
+      "id": "chatul-mifletzet",
+      "title": "חתול מפלצת",
+      "audio": "chatul_mifletzet.mp3",
+      "chart": "charts/chatul-mifletzet.png",
+      "lyrics": "lyrics/chatul-mifletzet.txt",
+      "bpm": 120
+    }
+  ]
 }
