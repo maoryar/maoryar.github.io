@@ -8,22 +8,6 @@
       "chart": "charts/ad-hakatze.png",
       "lyrics": "lyrics/ad-hakatze.txt",
       "bpm": 96
-    },
-    {
-      "id": "ani-shata",
-      "title": "אני שטה",
-      "audio": null,
-      "chart": "charts/ani-shata.png",
-      "lyrics": "lyrics/ani-shata.txt",
-      "bpm": 122
-    },
-    {
-      "id": "lach-itah",
-      "title": "לך איתה",
-      "audio": null,
-      "chart": null,
-      "lyrics": "lyrics/lach-itah.txt",
-      "bpm": 116
     }
   ]
 }
