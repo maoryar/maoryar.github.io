@@ -18,12 +18,12 @@
       "bpm": 122
     },
     {
-      "id": "ela",
-      "title": "אלה",
+      "id": "lach-itah",
+      "title": "לך איתה",
       "audio": null,
       "chart": null,
-      "lyrics": "lyrics/ela.txt",
-      "bpm": 124
+      "lyrics": "lyrics/lach-itah.txt",
+      "bpm": 116
     }
   ]
 }
