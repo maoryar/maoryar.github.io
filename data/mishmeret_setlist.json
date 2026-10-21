@@ -8,6 +8,14 @@
       "chart": "charts/chatul-mifletzet.png",
       "lyrics": "lyrics/chatul-mifletzet.txt",
       "bpm": 120
+    },
+    {
+      "id": "bye-bye-bye",
+      "title": "Bye Bye Bye (אמריקה)",
+      "audio": "bye_bye_bye.mp3",
+      "chart": null,
+      "lyrics": "lyrics/bye-bye-bye.txt",
+      "bpm": 172
     }
   ]
 }
