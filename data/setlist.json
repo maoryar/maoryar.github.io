@@ -16,6 +16,14 @@
       "chart": "charts/ani-shata.png",
       "lyrics": "lyrics/ani-shata.txt",
       "bpm": 122
+    },
+    {
+      "id": "ela",
+      "title": "אלה",
+      "audio": null,
+      "chart": null,
+      "lyrics": "lyrics/ela.txt",
+      "bpm": 124
     }
   ]
 }
