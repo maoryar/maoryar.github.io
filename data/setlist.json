@@ -12,7 +12,7 @@
     {
       "id": "ani-shata",
       "title": "אני שטה",
-      "audio": null,
+      "audio": "אני שטה.mp3",
       "chart": "charts/ani-shata.png",
       "lyrics": "lyrics/ani-shata.txt",
       "bpm": 122
