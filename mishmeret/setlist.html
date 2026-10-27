@@ -1845,7 +1845,7 @@
             return;
         }
 
-        fetch('../../data/mishmeret_setlist.json?v=' + Date.now())
+        fetch('../data/mishmeret_setlist.json?v=' + Date.now())
             .then(function (res) {
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 return res.json();
