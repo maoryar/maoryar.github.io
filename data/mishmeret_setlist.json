@@ -16,6 +16,14 @@
       "chart": null,
       "lyrics": "lyrics/bye-bye-bye.txt",
       "bpm": 172
+    },
+    {
+      "id": "shir-shel-yom-chulin",
+      "title": "שיר של יום חולין",
+      "audio": "shir_shel_yom_chulin.mp3",
+      "chart": null,
+      "lyrics": "lyrics/shir-shel-yom-chulin.txt",
+      "bpm": 92
     }
   ]
 }
