@@ -13,7 +13,7 @@
       "id": "bye-bye-bye",
       "title": "Bye Bye Bye",
       "audio": "bye_bye_bye.mp3",
-      "chart": null,
+      "chart": "charts/bye-bye-bye.png",
       "lyrics": "lyrics/bye-bye-bye.txt",
       "bpm": 172
     },
@@ -21,9 +21,17 @@
       "id": "shir-shel-yom-chulin",
       "title": "שיר של יום חולין",
       "audio": "shir_shel_yom_chulin.mp3",
-      "chart": null,
+      "chart": "charts/shir-shel-yom-chulin.png",
       "lyrics": "lyrics/shir-shel-yom-chulin.txt",
       "bpm": 92
+    },
+    {
+      "id": "masa-umatan",
+      "title": "משא ומתן",
+      "audio": null,
+      "chart": "charts/masa-umatan.png",
+      "lyrics": "lyrics/masa-umatan.txt",
+      "bpm": 88
     }
   ]
 }
