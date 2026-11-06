@@ -1,0 +1,718 @@
+/* Setlist page. Depends on base.css for tokens and shared components. */
+
+:root {
+    --player-h: 68px;
+}
+
+body {
+    /* Room for the fixed mini player. */
+    padding-bottom: calc(var(--player-h) + 10px);
+}
+
+/* ---------- Header ----------
+   Smaller than the home page hero so more songs fit above the fold. */
+
+.page-header {
+    position: relative;
+    padding: 1.6rem 1.5rem 1rem;
+    text-align: center;
+}
+
+.page-header .band-logo { font-size: 2.2rem; }
+
+.page-header .band-subtitle {
+    font-size: 0.95rem;
+    margin-top: 0.2rem;
+}
+
+.back-link {
+    position: absolute;
+    top: 1rem;
+    inset-inline-start: 1rem;
+    width: 38px;
+    height: 38px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--fill);
+    border-color: var(--border);
+}
+
+.back-link:hover { color: #fff; }
+
+main {
+    flex: 1;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 1rem 2rem;
+}
+
+/* ---------- Toolbar ---------- */
+
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+}
+
+.toolbar > * { flex-shrink: 0; height: 38px; }
+
+.play-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 20px;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.88rem;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(230, 104, 60, 0.3);
+    transition: background 0.2s ease;
+}
+
+.play-all-btn:hover { background: var(--accent-hover); }
+.play-all-btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+.version-picker {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--fill);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.version-picker:hover {
+    border-color: var(--accent-border);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.version-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.version-picker select {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--accent-hover);
+    font: inherit;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.version-picker option { background: var(--surface); color: var(--text); }
+
+.tool-btn {
+    position: relative;
+    width: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--fill);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.tool-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.tool-btn:hover,
+.tool-btn[aria-pressed="true"] {
+    color: var(--accent-hover);
+    border-color: var(--accent-border);
+    background: var(--accent-soft);
+}
+
+.repeat-badge {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--accent-hover);
+}
+
+/* ---------- Song list ---------- */
+
+.song-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.song {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 7px 10px 4px;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.song:hover { border-color: var(--border-strong); }
+
+.song.active {
+    border-color: rgba(230, 104, 60, 0.55);
+    background: linear-gradient(90deg, rgba(230, 104, 60, 0.1), var(--surface) 60%);
+}
+
+.song-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.play-btn {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.play-btn:hover,
+.song.active .play-btn {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.play-btn svg { width: 15px; height: 15px; fill: currentColor; }
+
+.song-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ltr so chip order is physical: BPM leftmost, chart rightmost. */
+.song-actions {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    direction: ltr;
+}
+
+.chip {
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--fill);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.chip:hover { color: #fff; background: var(--fill-strong); }
+
+.chip svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+.chip.bpm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-direction: column;
+    line-height: 1;
+}
+
+.chip.bpm .bpm-num { font-size: 0.72rem; font-weight: 900; color: var(--text); }
+
+.chip.bpm .bpm-sub {
+    margin-top: 1px;
+    font-size: 0.45rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.chip.bpm:hover {
+    border-color: rgba(230, 104, 60, 0.6);
+    background: rgba(230, 104, 60, 0.15);
+}
+
+.chip.bpm:hover span { color: var(--accent-hover); }
+
+.chip[aria-busy="true"] { opacity: 0.5; pointer-events: none; }
+
+/* Missing assets keep their chip so rows line up, but read as inert. */
+.chip:disabled,
+.chip:disabled:hover {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+}
+
+.chip:disabled span { color: var(--text-muted) !important; }
+
+/* ---------- Seek bar ----------
+   ltr on purpose: playback time reads left-to-right even in an RTL page,
+   the way YouTube and Spotify behave in Hebrew. */
+
+.seek {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    width: 100%;
+    height: 12px;
+    margin-top: 2px;
+    background: transparent;
+    direction: ltr;
+    cursor: pointer;
+    --track: rgba(255, 255, 255, 0.12);
+}
+
+.seek::-webkit-slider-runnable-track {
+    height: 3px;
+    border-radius: 3px;
+    background: linear-gradient(to right,
+        var(--accent) 0 var(--pct, 0%),
+        var(--track) var(--pct, 0%) 100%);
+}
+
+.seek::-moz-range-track { height: 3px; border-radius: 3px; background: var(--track); }
+.seek::-moz-range-progress { height: 3px; border-radius: 3px; background: var(--accent); }
+
+.seek::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 11px;
+    height: 11px;
+    margin-top: -4px;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.seek::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0;
+}
+
+/* Vendor pseudo-elements must stay in separate rules: one unknown selector
+   in a list invalidates the whole rule. */
+.song:hover .seek::-webkit-slider-thumb,
+.song.active .seek::-webkit-slider-thumb { opacity: 1; }
+
+.song:hover .seek::-moz-range-thumb,
+.song.active .seek::-moz-range-thumb { opacity: 1; }
+
+/* ---------- Status / footer ---------- */
+
+.status {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 3rem 1rem;
+    line-height: 1.8;
+}
+
+.status.error { color: var(--danger); }
+
+.status code {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    direction: ltr;
+}
+
+.last-updated {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent-hover);
+    opacity: 0.85;
+}
+
+/* ---------- Mini player ---------- */
+
+.player {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 900;
+    height: var(--player-h);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 14px;
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--surface-glass);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border);
+    transform: translateY(100%);
+    transition: transform 0.3s var(--ease-out);
+}
+
+.player.visible { transform: none; }
+
+.player-btn {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border: none;
+    border-radius: 50%;
+    background: none;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.player-btn:hover { background: rgba(255, 255, 255, 0.12); }
+.player-btn svg { width: 20px; height: 20px; fill: currentColor; }
+.player-btn.main svg { width: 26px; height: 26px; }
+
+.player-info { flex: 1 1 auto; min-width: 0; }
+
+.player-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.player-time {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+    text-align: start;
+}
+
+/* ---------- Viewer dialog ---------- */
+
+.viewer {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    border: none;
+    background: rgba(5, 6, 8, 0.94);
+    backdrop-filter: blur(15px);
+    color: var(--text);
+    /* Bottom padding reserves room for the nav pill. */
+    padding: 20px 20px 78px;
+}
+
+.viewer[open] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fade-in 0.25s ease;
+}
+
+.viewer::backdrop { background: transparent; }
+
+.viewer-close {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 2;
+    /* Solid, so it stays visible over a white chart. */
+    background: rgba(13, 14, 18, 0.85);
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.viewer-close:hover { background: rgba(40, 42, 50, 0.95); }
+
+.panel[hidden] { display: none !important; }
+
+/* Prev / counter / next pill. Bottom-centre so it never covers the chart
+   on narrow screens and stays thumb-reachable. */
+.viewer-nav {
+    position: absolute;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    direction: ltr;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px;
+    border-radius: 40px;
+    background: rgba(13, 14, 18, 0.82);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.viewer-nav[hidden] { display: none; }
+
+.viewer-nav-btn {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.viewer-nav-btn:hover { background: var(--fill-strong); }
+
+.viewer-nav-counter {
+    min-width: 3.6rem;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- BPM panel ---------- */
+
+.bpm-panel { text-align: center; user-select: none; }
+
+.bpm-song {
+    margin-bottom: 0.5rem;
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.bpm-value { font-size: 3.6rem; font-weight: 900; line-height: 1; }
+
+.bpm-unit {
+    margin-bottom: 1.8rem;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+}
+
+.pulse-stage {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pulse-core {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 50px rgba(230, 104, 60, 0.5);
+    transform: scale(0.82);
+    transition: transform 90ms ease-out;
+}
+
+.pulse-core.hit { transform: scale(1.12); }
+
+.pulse-ring {
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--accent-hover);
+    border-radius: 50%;
+    opacity: 0;
+}
+
+.pulse-ring.hit { animation: ring-out 0.6s ease-out; }
+
+@keyframes ring-out {
+    from { opacity: 0.7; transform: scale(0.55); }
+    to { opacity: 0; transform: scale(1.1); }
+}
+
+.beat-dots { display: flex; justify-content: center; gap: 14px; }
+
+.beat-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    transition: background 0.08s ease, transform 0.08s ease;
+}
+
+.beat-dot.on { background: var(--accent-hover); transform: scale(1.45); }
+.beat-dot.downbeat.on { background: #fff; }
+
+.bpm-hint { margin-top: 1.4rem; font-size: 0.85rem; color: var(--text-muted); }
+
+/* ---------- Chart panel ---------- */
+
+.chart-panel {
+    width: min(96vw, 900px);
+    height: min(92vh, 1000px);
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: var(--shadow-lg);
+}
+
+.chart-viewport {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    padding: 8px;
+    overflow: auto;
+}
+
+#chart-img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    margin: auto;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.chart-status {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    text-align: center;
+    background: #fff;
+    color: #4b5563;
+    font-size: 0.95rem;
+}
+
+.chart-status.visible { display: flex; }
+.chart-status.error { color: #b91c1c; }
+
+.chart-footer {
+    padding: 10px;
+    text-align: center;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+}
+
+.chart-footer a { color: var(--accent-hover); font-size: 0.9rem; }
+
+/* ---------- Lyrics panel ---------- */
+
+.lyrics-panel {
+    position: relative;
+    width: min(94vw, 620px);
+    /* Explicit height keeps iOS flex scrolling working; max-height keeps the
+       box inside the dialog when the mobile URL bar shrinks the viewport. */
+    height: min(78vh, 680px);
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 1.5rem 1.3rem 1.2rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    box-shadow: var(--shadow-lg);
+}
+
+.lyrics-title {
+    flex: none;
+    margin-bottom: 0.9rem;
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.lyrics-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: 0.5rem;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    line-height: 1.85;
+    font-size: 1.05rem;
+}
+
+.lyrics-body.message {
+    padding: 1.5rem 0;
+    text-align: center;
+    white-space: normal;
+    color: var(--text-muted);
+}
+
+.lyrics-body.message a { color: var(--accent-hover); }
+
+/* ---------- Small screens ---------- */
+
+@media (max-width: 560px) {
+    .page-header .band-logo { font-size: 1.8rem; }
+    .page-header .band-subtitle { font-size: 0.85rem; }
+    main { padding: 0 0.7rem 1.5rem; }
+    .song { padding: 6px 8px 3px; border-radius: 9px; }
+    .song-row { gap: 7px; }
+    .song-title { font-size: 0.93rem; }
+    .play-btn { width: 31px; height: 31px; }
+    .chip { width: 26px; height: 26px; }
+    .chip.bpm { width: 30px; height: 30px; }
+}
