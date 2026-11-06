@@ -1,4 +1,9 @@
-/* Setlist page. Depends on base.css for tokens and shared components. */
+/* Setlist page. Depends on base.css for tokens and shared components.
+ *
+ * The page is Hebrew (RTL), but the controls are laid out left-to-right,
+ * English style: play on the left, song tools on the right. Containers that
+ * hold controls set direction: ltr; text inside them uses
+ * unicode-bidi: plaintext so Hebrew and English titles each read naturally. */
 
 :root {
     --player-h: 68px;
@@ -51,6 +56,7 @@ main {
 /* ---------- Toolbar ---------- */
 
 .toolbar {
+    direction: ltr;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -83,6 +89,7 @@ main {
 .play-all-btn svg { width: 16px; height: 16px; fill: currentColor; }
 
 .version-picker {
+    direction: rtl;   /* "גרסה:" label reads before its value */
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -185,6 +192,7 @@ main {
 }
 
 .song-row {
+    direction: ltr;
     display: flex;
     align-items: center;
     gap: 9px;
@@ -214,6 +222,8 @@ main {
 .play-btn svg { width: 15px; height: 15px; fill: currentColor; }
 
 .song-title {
+    unicode-bidi: plaintext;
+    text-align: left;
     flex: 1 1 auto;
     min-width: 0;
     font-size: 1rem;
@@ -223,13 +233,12 @@ main {
     text-overflow: ellipsis;
 }
 
-/* ltr so chip order is physical: BPM leftmost, chart rightmost. */
+/* Chip order, left to right: BPM, download, lyrics, chart. */
 .song-actions {
     flex: none;
     display: flex;
     align-items: center;
     gap: 6px;
-    direction: ltr;
 }
 
 .chip {
@@ -382,6 +391,7 @@ main {
 /* ---------- Mini player ---------- */
 
 .player {
+    direction: ltr;
     position: fixed;
     inset: auto 0 0 0;
     z-index: 900;
@@ -421,6 +431,8 @@ main {
 .player-info { flex: 1 1 auto; min-width: 0; }
 
 .player-title {
+    unicode-bidi: plaintext;
+    text-align: left;
     font-size: 0.92rem;
     font-weight: 600;
     white-space: nowrap;
