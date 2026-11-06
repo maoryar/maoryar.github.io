@@ -1,11 +1,13 @@
-/* Setlist page entry point: loads data/setlist.json, renders the song list
- * and connects it to the player and the viewer. */
+/* Setlist page entry point: builds the page for the band declared on <body>,
+ * loads its setlist JSON, and connects the song list to the player and viewer. */
 import { ICONS, byId, el, fetchOk, formatTime, svg } from './util.js';
 import { Player } from './player.js';
 import { Viewer } from './viewer.js';
 import { bpmPanel, chartPanel, lyricsPanel } from './panels.js';
+import { readConfig, renderShell } from './shell.js';
 
-const DATA_URL = '../data/setlist.json';
+const config = readConfig();
+renderShell(config);
 
 const status = byId('status');
 
@@ -23,11 +25,11 @@ async function start() {
     let data;
     try {
         // no-cache: revalidate every time so a setlist edit shows up at once.
-        const res = await fetchOk(DATA_URL, { cache: 'no-cache' });
+        const res = await fetchOk(config.dataUrl, { cache: 'no-cache' });
         data = await res.json();
         showLastUpdated(res.headers.get('Last-Modified'));
     } catch (err) {
-        showStatus(`לא ניתן לטעון את הסטליסט: ${err.message} — ודאו שהקובץ data/setlist.json קיים ונגיש בתיקיית השורש.`, true);
+        showStatus(`לא ניתן לטעון את הסטליסט: ${err.message} — ודאו שהקובץ ${config.dataUrl} קיים ונגיש.`, true);
         return;
     }
 
@@ -269,7 +271,8 @@ function showLastUpdated(header) {
 }
 
 function fileProtocolHelp() {
-    const url = 'http://localhost:8000/hugzi/setlist.html';
+    // e.g. http://localhost:8000/mishmeret/setlist.html for this page
+    const url = `http://localhost:8000/${location.pathname.split('/').slice(-2).join('/')}`;
     return el('div', {}, [
         'הדף נפתח ישירות מהקובץ (file://) ולכן הדפדפן חוסם את טעינת הנתונים.',
         el('br'),
