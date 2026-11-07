@@ -103,14 +103,13 @@ export function createMarks({ stage, bar, band }) {
     bar.replaceChildren(toggle, ...showChips, sync, tools);
     bar.hidden = false;
 
-    /* ---------- Password form (first edit on the Band layer) ---------- */
+    /* ---------- Manager password (first edit on the Band layer) ---------- */
 
-    const nameInput = el('input', { attrs: { type: 'text', autocomplete: 'name', placeholder: 'השם שלך', maxlength: 40 } });
-    const passInput = el('input', { attrs: { type: 'password', autocomplete: 'current-password', placeholder: 'סיסמת הלהקה' } });
+    const passInput = el('input', { attrs: { type: 'password', autocomplete: 'current-password', placeholder: 'סיסמת מנהל', 'aria-label': 'סיסמת מנהל' } });
     const authError = el('div', { class: 'marks-auth-error', attrs: { role: 'alert' } });
     const authForm = el('form', { class: 'marks-auth', attrs: { hidden: true } }, [
-        el('p', {}, 'כדי לצייר על שכבת הלהקה צריך את סיסמת הלהקה.'),
-        nameInput, passInput, authError,
+        el('p', {}, 'כדי לצייר על שכבת הלהקה צריך סיסמת מנהל.'),
+        passInput, authError,
         el('div', { class: 'marks-auth-actions' }, [
             el('button', { class: 'marks-btn primary', attrs: { type: 'submit' } }, 'אישור'),
             button('marks-btn', {}, 'ביטול', () => closeAuth(false)),
@@ -123,7 +122,7 @@ export function createMarks({ stage, bar, band }) {
         e.preventDefault();
         authError.textContent = '';
         try {
-            if (await store.login(nameInput.value.trim(), passInput.value)) closeAuth(true);
+            if (await store.login(passInput.value)) closeAuth(true);
             else authError.textContent = 'הסיסמה שגויה.';
         } catch {
             authError.textContent = 'אין חיבור. נסו שוב כשיש אינטרנט.';
@@ -131,11 +130,10 @@ export function createMarks({ stage, bar, band }) {
     });
 
     function askPassword() {
-        nameInput.value = store.name;
         passInput.value = '';
         authError.textContent = '';
         authForm.hidden = false;
-        (nameInput.value ? passInput : nameInput).focus();
+        passInput.focus();
         return new Promise((resolve) => { authResolve = resolve; });
     }
 

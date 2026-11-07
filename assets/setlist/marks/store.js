@@ -11,7 +11,6 @@ const K = {
     band: (id) => `marks:band:${id}`,
     outbox: 'marks:outbox',
     password: 'marks:bandKey',
-    name: 'marks:by',
 };
 
 export const chartId = ({ band, song, chart }) => `${band}|${song}|${chart}`;
@@ -57,7 +56,6 @@ export class MarksStore extends EventTarget {
     /* ---------- Band ---------- */
 
     get hasPassword() { return !!localStorage.getItem(K.password); }
-    get name() { return localStorage.getItem(K.name) || ''; }
     get pending() { return this.outbox.length; }
 
     /** The band's marks as this device should show them: the last copy from
@@ -102,7 +100,7 @@ export class MarksStore extends EventTarget {
 
     /** Queue a save, then try to send it. */
     saveBand(key, { add = [], remove = [] }) {
-        this.outbox.push({ key, by: this.name, add, remove });
+        this.outbox.push({ key, add, remove });
         this.persistOutbox();
         this.flush();
     }
@@ -125,7 +123,7 @@ export class MarksStore extends EventTarget {
                     res = await fetch(`${this.api}/marks`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-Band-Key': password },
-                        body: JSON.stringify({ ...op.key, by: op.by, add: op.add, remove: op.remove }),
+                        body: JSON.stringify({ ...op.key, add: op.add, remove: op.remove }),
                     });
                 } catch {
                     this.retryLater();
@@ -178,14 +176,11 @@ export class MarksStore extends EventTarget {
 
     /** Check a password against the API, and remember it if it's right.
      *  Returns false if wrong, throws if the API can't be reached. */
-    async login(name, password) {
+    async login(password) {
         const res = await fetch(`${this.api}/auth`, { method: 'POST', headers: { 'X-Band-Key': password } });
         if (res.status === 401) return false;
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         localStorage.setItem(K.password, password);
-        localStorage.setItem(K.name, name);
-        for (const op of this.outbox) op.by ||= name;
-        this.persistOutbox();
         this.flush();
         return true;
     }
