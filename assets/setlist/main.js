@@ -39,14 +39,14 @@ async function start() {
         return;
     }
     status.hidden = true;
-    initPage(songs, data.baseUrl || '');
+    initPage(songs, data.baseUrl || '', config.bandId);
 }
 
-function initPage(songs, baseUrl) {
+function initPage(songs, baseUrl, bandId) {
     const player = new Player(byId('audio'), { songs, baseUrl });
     const viewer = new Viewer(byId('viewer'), songs, {
         bpm: bpmPanel(),
-        chart: chartPanel(baseUrl),
+        chart: chartPanel(baseUrl, bandId),
         lyrics: lyricsPanel(baseUrl),
     });
 

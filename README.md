@@ -22,7 +22,18 @@ assets/
     viewer.js                 the full-screen viewer dialog: open/close, prev/next, swipe
     panels.js                 the three viewer panels: BPM, chart, lyrics
     util.js                   small helpers
+    marks/                    drawing on charts: Mine (this device) and Band (shared) layers
+      marks.js                toolbar and input; only a Pencil or mouse draws, fingers scroll
+      ink.js                  stored mark data -> Fabric objects; eraser hit test
+      store.js                localStorage, band API, offline outbox
+      config.js               API address: test stage on http (local), production on https
+  vendor/                     Fabric.js and perfect-freehand, copied from npm (MIT)
 ```
+
+Chart marks are keyed by band folder + song id + chart path. Add `"chartRev": "2"`
+to a song in the setlist JSON to start that chart's marks clean (e.g. after
+replacing the chart image under the same name). The API lives in the private
+`setlist-marks-backend` repo.
 
 No build step: plain HTML, CSS and ES modules, served as-is by GitHub Pages.
 

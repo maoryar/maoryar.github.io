@@ -54,10 +54,16 @@ export function bpmPanel() {
     return { el: panel, has: (song) => !!song.bpm, show, hide: stop };
 }
 
-/* ---------- Chart ---------- */
+/* ---------- Chart ----------
+   The image sits in a stage sized to exactly the chart's on-screen box, so the
+   marks layer on top of it covers the chart and nothing else. */
 
-export function chartPanel(baseUrl) {
-    const panel = byId('chart-viewport').closest('.panel');
+const VIEWPORT_PADDING = 8;
+
+export function chartPanel(baseUrl, bandId) {
+    const viewport = byId('chart-viewport');
+    const panel = viewport.closest('.panel');
+    const stage = byId('chart-stage');
     const img = byId('chart-img');
     const status = byId('chart-status');
     const openLink = byId('chart-open');
@@ -67,8 +73,46 @@ export function chartPanel(baseUrl) {
         status.className = 'chart-status' + (text ? ' visible' : '') + (isError ? ' error' : '');
     };
 
-    img.addEventListener('load', () => setStatus());
+    let marks = null;
+    let marksLoading = null;
+    let current = null;
+
+    function fit() {
+        const ready = img.getAttribute('src') && img.complete && img.naturalWidth;
+        if (!ready) {
+            stage.style.width = stage.style.height = '';
+            return;
+        }
+        const w = viewport.clientWidth - 2 * VIEWPORT_PADDING;
+        const h = viewport.clientHeight - 2 * VIEWPORT_PADDING;
+        const scale = Math.min(w / img.naturalWidth, h / img.naturalHeight);
+        const width = Math.floor(img.naturalWidth * scale);
+        const height = Math.floor(img.naturalHeight * scale);
+        stage.style.width = `${width}px`;
+        stage.style.height = `${height}px`;
+        marks?.resize(width, height);
+    }
+    new ResizeObserver(() => fit()).observe(viewport);
+
+    /* The drawing code (and Fabric) loads on first use. If it fails, the chart
+       still works; there are just no marks. */
+    function loadMarks() {
+        marksLoading ??= import('./marks/marks.js')
+            .then(({ createMarks }) => {
+                marks = createMarks({ stage, bar: byId('marks-bar'), band: bandId });
+                if (current) marks.show(current);
+                fit();
+            })
+            .catch((err) => {
+                // Try again on the next chart, e.g. after a dropped connection.
+                marksLoading = null;
+                console.warn('Chart marks are unavailable', err);
+            });
+    }
+
+    img.addEventListener('load', () => { setStatus(); fit(); });
     img.addEventListener('error', () => {
+        fit();
         if (img.getAttribute('src')) setStatus('טעינת האקורדים נכשלה · נסו לפתוח את הקובץ בלשונית חדשה.', true);
     });
 
@@ -76,14 +120,21 @@ export function chartPanel(baseUrl) {
         const url = assetUrl(baseUrl, song.chart);
         openLink.href = url;
         img.alt = `אקורדים: ${song.title}`;
-        if (img.getAttribute('src') === url && img.complete) return;
+        current = song;
+        marks?.show(song);
+        loadMarks();
+        if (img.getAttribute('src') === url && img.complete) return fit();
         setStatus('טוען אקורדים…');
         img.src = url;
+        fit();
     }
 
     function hide() {
+        current = null;
+        marks?.hide();
         img.removeAttribute('src');   // stop any in-flight download
         setStatus();
+        fit();
     }
 
     return { el: panel, has: (song) => !!song.chart, show, hide };

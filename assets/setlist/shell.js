@@ -83,8 +83,9 @@ const TEMPLATE = `
     </section>
 
     <section class="panel chart-panel" data-kind="chart" hidden>
+        <div class="marks-bar" id="marks-bar" hidden></div>
         <div class="chart-viewport" id="chart-viewport">
-            <img id="chart-img" alt="">
+            <div class="chart-stage" id="chart-stage"><img id="chart-img" alt=""></div>
             <div class="chart-status" id="chart-status"></div>
         </div>
         <div class="chart-footer">
@@ -110,7 +111,9 @@ const TEMPLATE = `
 
 export function readConfig(body = document.body) {
     const { band = '', setlist = '../data/setlist.json', home = '' } = body.dataset;
-    return { band, dataUrl: setlist, homeUrl: home };
+    // The page's folder (hugzi, mishmeret, hugzi-old) identifies the band for chart marks.
+    const bandId = location.pathname.split('/').filter(Boolean).at(-2) || 'site';
+    return { band, bandId, dataUrl: setlist, homeUrl: home };
 }
 
 export function renderShell({ band, homeUrl }) {

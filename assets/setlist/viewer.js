@@ -33,6 +33,7 @@ export class Viewer {
 
         // Arrow keys mirror the home page gallery: Right = next, Left = previous.
         dialog.addEventListener('keydown', (e) => {
+            if (e.target.closest?.('input, textarea')) return;
             if (e.key === 'ArrowRight') { e.preventDefault(); this.navigate(1); }
             if (e.key === 'ArrowLeft') { e.preventDefault(); this.navigate(-1); }
         });
@@ -97,9 +98,10 @@ export class Viewer {
         let start = null;
 
         this.dialog.addEventListener('touchstart', (e) => {
-            start = e.touches.length === 1
+            // Two fingers is a pinch, and an Apple Pencil draws: neither is a swipe.
+            start = e.touches.length === 1 && e.touches[0].touchType !== 'stylus'
                 ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
-                : null;   // pinch: not a swipe
+                : null;
         }, { passive: true });
 
         this.dialog.addEventListener('touchend', (e) => {
