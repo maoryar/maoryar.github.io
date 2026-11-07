@@ -5,12 +5,13 @@
  * that haven't reached the API yet. Saves leave the outbox only once the API
  * confirms them, so nothing is lost when a rehearsal room has no Wi-Fi.
  */
+import { forgetManagerPassword, managerPassword } from '../manager.js';
+
 const RETRY_MS = 30000;
 const K = {
     mine: (id) => `marks:mine:${id}`,
     band: (id) => `marks:band:${id}`,
     outbox: 'marks:outbox',
-    password: 'marks:bandKey',
 };
 
 export const chartId = ({ band, song, chart }) => `${band}|${song}|${chart}`;
@@ -55,7 +56,6 @@ export class MarksStore extends EventTarget {
 
     /* ---------- Band ---------- */
 
-    get hasPassword() { return !!localStorage.getItem(K.password); }
     get pending() { return this.outbox.length; }
 
     /** The band's marks as this device should show them: the last copy from
@@ -111,7 +111,7 @@ export class MarksStore extends EventTarget {
     }
 
     async flush() {
-        const password = localStorage.getItem(K.password);
+        const password = managerPassword();
         if (this.flushing || !password) return;
         this.flushing = true;
         clearTimeout(this.retryTimer);
@@ -130,7 +130,7 @@ export class MarksStore extends EventTarget {
                     return;
                 }
                 if (res.status === 401) {
-                    localStorage.removeItem(K.password);
+                    forgetManagerPassword();
                     this.dispatchEvent(new CustomEvent('auth-needed'));
                     return;
                 }
@@ -172,16 +172,5 @@ export class MarksStore extends EventTarget {
 
     emitStatus() {
         this.dispatchEvent(new CustomEvent('status'));
-    }
-
-    /** Check a password against the API, and remember it if it's right.
-     *  Returns false if wrong, throws if the API can't be reached. */
-    async login(password) {
-        const res = await fetch(`${this.api}/auth`, { method: 'POST', headers: { 'X-Band-Key': password } });
-        if (res.status === 401) return false;
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        localStorage.setItem(K.password, password);
-        this.flush();
-        return true;
     }
 }

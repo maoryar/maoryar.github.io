@@ -10,7 +10,8 @@
  */
 import { StaticCanvas } from '../../vendor/fabric-7.4.0.min.mjs';
 import { el, svg } from '../util.js';
-import { MARKS_API } from './config.js';
+import { API } from '../api.js';
+import { askManagerPassword, managerPassword } from '../manager.js';
 import { SCENE_WIDTH, toObject, touches } from './ink.js';
 import { MarksStore, chartId, newId } from './store.js';
 
@@ -44,7 +45,7 @@ function loadPrefs() {
 }
 
 export function createMarks({ stage, bar, band }) {
-    const store = new MarksStore(MARKS_API);
+    const store = new MarksStore(API);
     const prefs = loadPrefs();
     const savePrefs = () => localStorage.setItem('marks:prefs', JSON.stringify(prefs));
 
@@ -103,52 +104,12 @@ export function createMarks({ stage, bar, band }) {
     bar.replaceChildren(toggle, ...showChips, sync, tools);
     bar.hidden = false;
 
-    /* ---------- Manager password (first edit on the Band layer) ---------- */
-
-    const passInput = el('input', { attrs: { type: 'password', autocomplete: 'current-password', placeholder: 'סיסמת מנהל', 'aria-label': 'סיסמת מנהל' } });
-    const authError = el('div', { class: 'marks-auth-error', attrs: { role: 'alert' } });
-    const authForm = el('form', { class: 'marks-auth', attrs: { hidden: true } }, [
-        el('p', {}, 'כדי לצייר על שכבת הלהקה צריך סיסמת מנהל.'),
-        passInput, authError,
-        el('div', { class: 'marks-auth-actions' }, [
-            el('button', { class: 'marks-btn primary', attrs: { type: 'submit' } }, 'אישור'),
-            button('marks-btn', {}, 'ביטול', () => closeAuth(false)),
-        ]),
-    ]);
-    stage.parentElement.append(authForm);
-    let authResolve = null;
-
-    authForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        authError.textContent = '';
-        try {
-            if (await store.login(passInput.value)) closeAuth(true);
-            else authError.textContent = 'הסיסמה שגויה.';
-        } catch {
-            authError.textContent = 'אין חיבור. נסו שוב כשיש אינטרנט.';
-        }
-    });
-
-    function askPassword() {
-        passInput.value = '';
-        authError.textContent = '';
-        authForm.hidden = false;
-        passInput.focus();
-        return new Promise((resolve) => { authResolve = resolve; });
-    }
-
-    function closeAuth(ok) {
-        authForm.hidden = true;
-        authResolve?.(ok);
-        authResolve = null;
-    }
-
     store.addEventListener('auth-needed', async () => {
-        if (await askPassword()) store.flush();
+        if (await askManagerPassword()) store.flush();
     });
 
     async function chooseLayer(layer) {
-        if (layer === 'band' && !store.hasPassword && !(await askPassword())) return;
+        if (layer === 'band' && !managerPassword() && !(await askManagerPassword())) return;
         prefs.layer = layer;
         prefs.show[layer] = true;
         savePrefs();
@@ -474,7 +435,6 @@ export function createMarks({ stage, bar, band }) {
         hide() {
             finishLive();
             commitText();
-            closeAuth(false);
             clearInterval(refreshTimer);
             key = null;
             render();

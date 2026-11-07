@@ -22,18 +22,26 @@ assets/
     viewer.js                 the full-screen viewer dialog: open/close, prev/next, swipe
     panels.js                 the three viewer panels: BPM, chart, lyrics
     util.js                   small helpers
+    api.js                    backend address: test stage on http (local), production on https
+    manager.js                the manager password prompt (band marks and setlist editing)
+    order.js                  the manager's song order and BPM changes, applied over the JSON
+    editor.js                 setlist edit mode: drag to reorder, change BPM
     marks/                    drawing on charts: Mine (this device) and Band (shared) layers
       marks.js                toolbar and input; only a Pencil or mouse draws, fingers scroll
       ink.js                  stored mark data -> Fabric objects; eraser hit test
       store.js                localStorage, band API, offline outbox
-      config.js               API address: test stage on http (local), production on https
-  vendor/                     Fabric.js and perfect-freehand, copied from npm (MIT)
+  vendor/                     Fabric.js, perfect-freehand and SortableJS, copied from npm (MIT)
 ```
 
 Chart marks are keyed by band folder + song id + chart path. Add `"chartRev": "2"`
 to a song in the setlist JSON to start that chart's marks clean (e.g. after
 replacing the chart image under the same name). The API lives in the private
 `setlist-marks-backend` repo.
+
+The manager can reorder songs and change BPMs on the page (the list icon in the
+toolbar). Those edits live in the API, on top of the JSON: the JSON is still the
+list of songs and where to add or remove them. A song added to the JSON shows up
+at the end of the manager's order.
 
 No build step: plain HTML, CSS and ES modules, served as-is by GitHub Pages.
 

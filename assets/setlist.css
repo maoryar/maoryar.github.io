@@ -790,27 +790,34 @@ main {
     unicode-bidi: plaintext;
 }
 
-.marks-auth {
-    position: absolute;
-    top: 56px;
-    left: 50%;
-    z-index: 3;
-    width: min(320px, 90%);
-    transform: translateX(-50%);
-    display: grid;
-    gap: 8px;
-    padding: 14px;
+/* Leave room for the viewer's close button where the panel reaches it. */
+@media (max-width: 1000px) {
+    .marks-bar { padding-left: 64px; }
+}
+
+/* ---------- Manager password ---------- */
+
+.manager-dialog {
+    position: fixed;
+    inset: 0;
+    height: fit-content;
+    margin: auto;
+    width: min(340px, 92vw);
+    padding: 0;
     border: 1px solid var(--border-strong);
     border-radius: 12px;
     background: var(--surface);
-    box-shadow: var(--shadow-lg);
     color: var(--text);
+    box-shadow: var(--shadow-lg);
 }
 
-.marks-auth[hidden] { display: none; }
-.marks-auth p { margin: 0; font-size: 0.9rem; }
+.manager-dialog::backdrop { background: rgba(0, 0, 0, 0.55); }
 
-.marks-auth input {
+.manager-auth { display: grid; gap: 10px; padding: 16px; }
+.manager-auth p { margin: 0; font-size: 0.95rem; }
+
+.manager-auth input,
+.edit-bpm input {
     min-height: 38px;
     padding: 0 10px;
     border: 1px solid var(--border-strong);
@@ -820,13 +827,83 @@ main {
     font: inherit;
 }
 
-.marks-auth-error { min-height: 1.2em; color: var(--danger); font-size: 0.85rem; }
-.marks-auth-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.manager-error { min-height: 1.2em; color: var(--danger); font-size: 0.85rem; }
+.manager-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
-/* Leave room for the viewer's close button where the panel reaches it. */
-@media (max-width: 1000px) {
-    .marks-bar { padding-left: 64px; }
+.manager-btn,
+.editor-btn {
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--fill);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
 }
+
+.manager-btn.primary,
+.editor-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.editor-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* ---------- Setlist editor ---------- */
+
+.setlist-editor[hidden],
+.song-list[hidden] { display: none; }
+
+/* Controls run left to right, like the rest of the page. */
+.editor-bar {
+    direction: ltr;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.editor-status { font-size: 0.85rem; color: var(--text-muted); }
+.editor-status.warn { color: #fbbf24; }
+.editor-hint { margin: 0 0 10px; font-size: 0.85rem; color: var(--text-muted); }
+
+.edit-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+
+/* Same layout as a song row: handle where the play button is, BPM where
+   its chip is. */
+.edit-row {
+    direction: ltr;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+}
+
+.edit-row.dragging { opacity: 0.4; }
+
+/* A big handle: only it starts a drag, so the list still scrolls with a finger. */
+.drag-handle {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--fill);
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    cursor: grab;
+    touch-action: none;
+}
+
+.edit-title { flex: 1; min-width: 0; unicode-bidi: plaintext; text-align: left; font-weight: 600; }
+
+.edit-bpm { display: inline-flex; align-items: center; gap: 6px; direction: ltr; color: var(--text-muted); font-size: 0.8rem; }
+.edit-bpm input { width: 5.5em; }
+.edit-bpm input.invalid { border-color: var(--danger); }
 
 /* ---------- Lyrics panel ---------- */
 

@@ -40,6 +40,17 @@ const TEMPLATE = `
             </svg>
             <span class="repeat-badge" id="repeat-badge"></span>
         </button>
+
+        <button type="button" class="tool-btn" id="edit-btn" aria-pressed="false" title="עריכת הסטליסט (מנהל)" aria-label="עריכת הסטליסט (מנהל)">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <line x1="10" y1="6" x2="21" y2="6"/>
+                <line x1="10" y1="12" x2="21" y2="12"/>
+                <line x1="10" y1="18" x2="21" y2="18"/>
+                <polyline points="3 8 5 6 7 8"/>
+                <polyline points="3 16 5 18 7 16"/>
+                <line x1="5" y1="6" x2="5" y2="18"/>
+            </svg>
+        </button>
     </div>
 
     <ul class="song-list" id="song-list"></ul>

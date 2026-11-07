@@ -5,6 +5,11 @@ import { Player } from './player.js';
 import { Viewer } from './viewer.js';
 import { bpmPanel, chartPanel, lyricsPanel } from './panels.js';
 import { readConfig, renderShell } from './shell.js';
+import { EMPTY, applyEdits, cachedEdits, fetchEdits } from './order.js';
+
+// Without a cached copy, wait this long for the manager's edits before
+// showing the JSON order (the API can be slow to wake up).
+const FIRST_EDITS_WAIT_MS = 1500;
 
 const config = readConfig();
 renderShell(config);
@@ -22,24 +27,67 @@ async function start() {
         return;
     }
 
+    const band = config.bandId;
+    const fresh = fetchEdits(band);
     let data;
     try {
         // no-cache: revalidate every time so a setlist edit shows up at once.
         const res = await fetchOk(config.dataUrl, { cache: 'no-cache' });
         data = await res.json();
-        showLastUpdated(res.headers.get('Last-Modified'));
+        jsonDate = new Date(res.headers.get('Last-Modified'));
     } catch (err) {
         showStatus(`לא ניתן לטעון את הסטליסט: ${err.message} — ודאו שהקובץ ${config.dataUrl} קיים ונגיש.`, true);
         return;
     }
 
-    const songs = Array.isArray(data.songs) ? data.songs : [];
-    if (!songs.length) {
+    baseSongs = Array.isArray(data.songs) ? data.songs : [];
+    if (!baseSongs.length) {
         showStatus('הסטליסט ריק.');
         return;
     }
+
+    // The manager's order and BPMs: the device's copy if it has one, else a
+    // short wait for the API. Either way the latest is applied when it arrives.
+    edits = cachedEdits(band)
+        ?? await Promise.race([fresh, new Promise((r) => setTimeout(r, FIRST_EDITS_WAIT_MS))])
+        ?? EMPTY;
     status.hidden = true;
-    initPage(songs, data.baseUrl || '', config.bandId);
+    initPage(applyEdits(baseSongs, edits), data.baseUrl || '', band);
+    showLastUpdated();
+    const latest = await fresh;
+    if (latest) setEdits(latest);
+}
+
+/* ---------- manager edits (order, BPM) ---------- */
+
+let baseSongs = [];       // the JSON's songs, in JSON order
+let edits = EMPTY;        // the manager's edits on screen
+let jsonDate = null;
+let page = null;          // { songs, rows, player, viewer, editor }
+let pendingEdits = null;  // newer edits waiting for the viewer or editor to close
+
+function setEdits(next) {
+    if (!page || next.version === edits.version) return;
+    if (page.viewer.isOpen || page.editor?.isOpen) {
+        pendingEdits = next;
+        return;
+    }
+    edits = next;
+    pendingEdits = null;
+    relayout(applyEdits(baseSongs, edits));
+    showLastUpdated();
+}
+
+/** Show songs in a new order without interrupting playback. The player and
+ *  viewer share the `songs` array, so it is updated in place. */
+function relayout(next) {
+    const { songs, rows, player } = page;
+    const playingId = player.song?.id;
+    songs.splice(0, songs.length, ...next);
+    player.index = playingId ? songs.findIndex((s) => s.id === playingId) : -1;
+    rows.splice(0, rows.length, ...songs.map((song, i) => renderRow(song, i, page)));
+    byId('song-list').replaceChildren(...rows.map((r) => r.li));
+    player.dispatchEvent(new Event('change'));
 }
 
 function initPage(songs, baseUrl, bandId) {
@@ -52,9 +100,40 @@ function initPage(songs, baseUrl, bandId) {
 
     const rows = songs.map((song, i) => renderRow(song, i, { player, viewer }));
     byId('song-list').replaceChildren(...rows.map((r) => r.li));
+    page = { songs, rows, player, viewer, editor: null };
 
     bindPlayerUi(player, rows);
     bindToolbar(player);
+
+    // Edits that arrived while the viewer or editor was open.
+    byId('viewer').addEventListener('close', () => { if (pendingEdits) setEdits(pendingEdits); });
+
+    // Edit mode loads on first use (it brings the drag-and-drop library).
+    byId('edit-btn').addEventListener('click', async () => {
+        if (!page.editor) {
+            const { createEditor } = await import('./editor.js');
+            page.editor = createEditor({
+                band: bandId,
+                base: () => baseSongs,
+                edits: () => edits,
+                onSaved: (saved) => {
+                    pendingEdits = null;
+                    edits = saved;
+                    relayout(applyEdits(baseSongs, edits));
+                    showLastUpdated();
+                },
+            });
+        }
+        await page.editor.toggle();
+        if (!page.editor.isOpen && pendingEdits) setEdits(pendingEdits);
+    });
+
+    // Keep up with edits made elsewhere while the page stays open.
+    document.addEventListener('visibilitychange', async () => {
+        if (document.visibilityState !== 'visible') return;
+        const latest = await fetchEdits(bandId);
+        if (latest) setEdits(latest);
+    });
 
     document.addEventListener('keydown', (e) => {
         if (viewer.isOpen) return;   // Space must not reach the player behind the viewer
@@ -255,11 +334,12 @@ function showStatus(content, isError = false) {
     status.replaceChildren(content);
 }
 
-/** "Last updated" comes from the JSON's Last-Modified header, which GitHub
- *  Pages sets on every deploy, so it can no longer go stale. */
-function showLastUpdated(header) {
-    const date = header ? new Date(header) : null;
-    if (!date || Number.isNaN(date.getTime())) return;
+/** "Last updated" is the later of the JSON's Last-Modified header (GitHub
+ *  Pages sets it on every deploy) and the manager's last edit. */
+function showLastUpdated() {
+    const times = [jsonDate?.getTime(), edits.updated].filter((t) => Number.isFinite(t) && t > 0);
+    if (!times.length) return;
+    const date = new Date(Math.max(...times));
     const text = new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Asia/Jerusalem',
         day: '2-digit', month: '2-digit', year: 'numeric',
