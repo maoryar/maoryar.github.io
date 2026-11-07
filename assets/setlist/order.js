@@ -2,7 +2,10 @@
  * on top of the setlist JSON. The JSON stays the list of songs; a song added
  * to it shows up at the end, a removed one simply drops out.
  *
- *   { version, order: [song id, ...], bpm: { song id: number }, updated }
+ *   { version, order: [song id, ...], bpm: { song id: number }, disabled: [song id, ...], updated }
+ *
+ * A disabled song stays in the list, greyed out, and every sequence (play all,
+ * next/previous, swiping through BPM, lyrics and charts) skips it.
  *
  * A copy is cached on the device, so the page shows the right order at once
  * and also without a connection. */
@@ -10,7 +13,7 @@ import { API } from './api.js';
 import { forgetManagerPassword, managerPassword } from './manager.js';
 
 const cacheKey = (band) => `setlist:${band}`;
-export const EMPTY = { version: 0, order: [], bpm: {}, updated: 0 };
+export const EMPTY = { version: 0, order: [], bpm: {}, disabled: [], updated: 0 };
 
 export function cachedEdits(band) {
     try {
@@ -52,16 +55,21 @@ export function applyEdits(base, edits) {
         }
     }
     out.push(...base.filter((s) => byId.has(s.id)));
-    return out.map((s) => (edits.bpm?.[s.id] ? { ...s, bpm: edits.bpm[s.id] } : s));
+    const disabled = new Set(edits.disabled ?? []);
+    return out.map((s) => {
+        const bpm = edits.bpm?.[s.id];
+        if (!bpm && !disabled.has(s.id)) return s;
+        return { ...s, ...(bpm && { bpm }), ...(disabled.has(s.id) && { disabled: true }) };
+    });
 }
 
 /** Save. Returns { status: 'ok' | 'conflict' | 'auth', edits }; throws offline.
  *  On a conflict, `edits` is what the other manager saved. */
-export async function saveEdits(band, { version, order, bpm }) {
+export async function saveEdits(band, { version, order, bpm, disabled }) {
     const res = await fetch(`${API}/setlist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Band-Key': managerPassword() || '' },
-        body: JSON.stringify({ band, version, order, bpm }),
+        body: JSON.stringify({ band, version, order, bpm, disabled }),
     });
     if (res.status === 401) {
         forgetManagerPassword();

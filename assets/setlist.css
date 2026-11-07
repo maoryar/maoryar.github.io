@@ -140,6 +140,8 @@ main {
     transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
+.tool-btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+
 .tool-btn svg {
     width: 16px;
     height: 16px;
@@ -882,6 +884,32 @@ main {
 }
 
 .edit-row.dragging { opacity: 0.4; }
+
+/* Vertical scrolling stays with the page; horizontal moves are the swipe. */
+.edit-row { touch-action: pan-y; transition: transform 0.15s ease, opacity 0.15s ease; }
+.edit-row.disabled { opacity: 0.45; }
+.edit-row.disabled .edit-title { text-decoration: line-through; }
+
+.edit-toggle {
+    flex: none;
+    min-width: 64px;
+    min-height: 32px;
+    padding: 0 10px;
+    border: 1px solid var(--accent-border);
+    border-radius: 16px;
+    background: var(--accent-soft);
+    color: var(--accent-hover);
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.edit-toggle[aria-pressed="true"] { border-color: var(--border-strong); background: var(--fill); color: var(--text-muted); }
+
+/* A disabled song: still there and playable on purpose, but skipped by
+   play all, next/previous and the viewer's song-to-song navigation. */
+.song.disabled { opacity: 0.4; }
+.song.disabled .song-title { text-decoration: line-through; }
 
 /* A big handle: only it starts a drag, so the list still scrolls with a finger. */
 .drag-handle {

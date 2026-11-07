@@ -43,10 +43,10 @@ export class Viewer {
 
     get isOpen() { return this.dialog.open; }
 
-    /** Indices of songs that have this kind of asset. */
+    /** Indices of songs that have this kind of asset and aren't disabled. */
     eligible(kind) {
         const { has } = this.panels[kind];
-        return this.songs.flatMap((song, i) => (has(song) ? [i] : []));
+        return this.songs.flatMap((song, i) => (has(song) && !song.disabled ? [i] : []));
     }
 
     open(kind, index) {
@@ -83,15 +83,25 @@ export class Viewer {
     navigate(delta) {
         if (!this.kind) return;
         const list = this.eligible(this.kind);
-        if (list.length < 2) return;
-        const pos = Math.max(0, list.indexOf(this.index));
-        this.open(this.kind, list[(pos + delta + list.length) % list.length]);
+        const pos = list.indexOf(this.index);
+        if (pos >= 0) {
+            if (list.length < 2) return;
+            this.open(this.kind, list[(pos + delta + list.length) % list.length]);
+            return;
+        }
+        // The open song is disabled (opened on purpose): go to the nearest
+        // eligible song in that direction.
+        if (!list.length) return;
+        const after = list.find((i) => i > this.index);
+        const before = [...list].reverse().find((i) => i < this.index);
+        this.open(this.kind, delta > 0 ? (after ?? list[0]) : (before ?? list.at(-1)));
     }
 
     updateNav() {
         const list = this.eligible(this.kind);
-        this.nav.hidden = list.length < 2;
-        this.counter.textContent = `${list.indexOf(this.index) + 1} / ${list.length}`;
+        const pos = list.indexOf(this.index);
+        this.nav.hidden = pos >= 0 ? list.length < 2 : !list.length;
+        this.counter.textContent = pos >= 0 ? `${pos + 1} / ${list.length}` : `– / ${list.length}`;
     }
 
     setupSwipe() {

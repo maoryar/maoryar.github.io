@@ -41,7 +41,7 @@ const TEMPLATE = `
             <span class="repeat-badge" id="repeat-badge"></span>
         </button>
 
-        <button type="button" class="tool-btn" id="edit-btn" aria-pressed="false" title="עריכת הסטליסט (מנהל)" aria-label="עריכת הסטליסט (מנהל)">
+        <button type="button" class="tool-btn" id="edit-btn" aria-pressed="false" disabled title="עריכת הסטליסט (מנהל)" aria-label="עריכת הסטליסט (מנהל)">
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <line x1="10" y1="6" x2="21" y2="6"/>
                 <line x1="10" y1="12" x2="21" y2="12"/>

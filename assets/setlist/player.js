@@ -46,6 +46,22 @@ export class Player extends EventTarget {
     /* ---------- state ---------- */
 
     get song() { return this.songs[this.index] ?? null; }
+
+    /** The next song from `from` in direction `delta` (wrapping around) that
+     *  isn't disabled, or -1 if there is none. from = -1 means "before the first". */
+    nextIndex(from, delta) {
+        const n = this.songs.length;
+        for (let k = 1; k <= n; k++) {
+            const i = (((from + delta * k) % n) + n) % n;
+            if (!this.songs[i].disabled) return i;
+        }
+        return -1;
+    }
+
+    /** True if no enabled song comes after song i (the end of the set). */
+    isLastEnabled(i) {
+        return !this.songs.slice(i + 1).some((s) => !s.disabled);
+    }
     get playing() { return this.index >= 0 && !this.audio.paused && !this.audio.ended; }
     get repeat() { return REPEAT_MODES[this.repeatIdx]; }
 
@@ -83,8 +99,14 @@ export class Player extends EventTarget {
         this.audio.play()?.catch(() => {});
     }
 
+    /** Play the set from its first enabled song. */
+    playAll() {
+        const first = this.nextIndex(-1, 1);
+        if (first >= 0) this.load(first, { autoplay: true });
+    }
+
     togglePlayback() {
-        if (this.index < 0) return this.load(0, { autoplay: true });
+        if (this.index < 0) return this.playAll();
         if (this.audio.paused) this.play(); else this.audio.pause();
     }
 
@@ -94,11 +116,12 @@ export class Player extends EventTarget {
         else this.load(i, { autoplay: true });
     }
 
+    /** Next / previous, skipping disabled songs. A disabled song can still be
+     *  played on purpose (its own play button); stepping leaves it. */
     step(delta) {
-        const n = this.songs.length;
-        if (!n) return;
-        const next = this.index < 0 ? 0 : (this.index + delta + n) % n;
-        this.load(next, { autoplay: true });
+        if (!this.songs.length) return;
+        const next = this.index < 0 ? this.nextIndex(-1, 1) : this.nextIndex(this.index, delta);
+        if (next >= 0) this.load(next, { autoplay: true });
     }
 
     /** Seek song i to a 0..1 fraction. Seeking a song that isn't loaded loads
@@ -137,7 +160,7 @@ export class Player extends EventTarget {
             this.play();
             return;
         }
-        if (mode === 'off' && this.index === this.songs.length - 1) {
+        if (mode === 'off' && this.isLastEnabled(this.index)) {
             // End of the set: stop and rewind, keep the last song selected.
             this.audio.currentTime = 0;
             this.dispatchEvent(new Event('change'));

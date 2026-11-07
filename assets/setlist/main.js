@@ -108,7 +108,9 @@ function initPage(songs, baseUrl, bandId) {
     // Edits that arrived while the viewer or editor was open.
     byId('viewer').addEventListener('close', () => { if (pendingEdits) setEdits(pendingEdits); });
 
-    // Edit mode loads on first use (it brings the drag-and-drop library).
+    // Edit mode loads on first use (it brings the drag-and-drop library). The
+    // button stays disabled until the page is ready, so an early tap isn't lost.
+    byId('edit-btn').disabled = false;
     byId('edit-btn').addEventListener('click', async () => {
         if (!page.editor) {
             const { createEditor } = await import('./editor.js');
@@ -213,7 +215,10 @@ function renderRow(song, i, { player, viewer }) {
         }),
     ]);
 
-    const li = el('li', { class: 'song', attrs: { id: `song-${song.id}` } }, [
+    const li = el('li', {
+        class: song.disabled ? 'song disabled' : 'song',
+        attrs: { id: `song-${song.id}`, title: song.disabled ? 'השיר מושבת: מדלגים עליו בניגון ובמעבר בין שירים' : null },
+    }, [
         el('div', { class: 'song-row' }, [
             playBtn,
             el('span', { class: 'song-title' }, song.title),
@@ -297,7 +302,7 @@ function bindPlayerUi(player, rows) {
 }
 
 function bindToolbar(player) {
-    byId('play-all').addEventListener('click', () => player.load(0, { autoplay: true }));
+    byId('play-all').addEventListener('click', () => player.playAll());
     byId('repeat-btn').addEventListener('click', () => player.cycleRepeat());
     byId('version-select').addEventListener('change', (e) => player.setVersion(e.target.value));
 }

@@ -41,7 +41,9 @@ replacing the chart image under the same name). The API lives in the private
 The manager can reorder songs and change BPMs on the page (the list icon in the
 toolbar). Those edits live in the API, on top of the JSON: the JSON is still the
 list of songs and where to add or remove them. A song added to the JSON shows up
-at the end of the manager's order.
+at the end of the manager's order. The manager can also disable a song (swipe
+it left in edit mode): it stays in the list, greyed out, and play all,
+next/previous and the viewer's song-to-song navigation skip it.
 
 No build step: plain HTML, CSS and ES modules, served as-is by GitHub Pages.
 
