@@ -16,6 +16,14 @@
       "chart": "charts/ani-shata.png",
       "lyrics": "lyrics/ani-shata.txt",
       "bpm": 122
+    },
+    {
+      "id": "baa-meahava",
+      "title": "באה מאהבה",
+      "audio": null,
+      "chart": "charts/baa-meahava.png",
+      "lyrics": "lyrics/baa-meahava.txt",
+      "bpm": null
     }
   ]
 }
