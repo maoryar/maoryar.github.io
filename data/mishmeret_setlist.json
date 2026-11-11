@@ -28,7 +28,7 @@
     {
       "id": "masa-umatan",
       "title": "משא ומתן",
-      "audio": null,
+      "audio": "masa_umatan.mp3",
       "chart": "charts/masa-umatan.png",
       "lyrics": "lyrics/masa-umatan.txt",
       "bpm": 88
