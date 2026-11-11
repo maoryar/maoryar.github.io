@@ -56,7 +56,8 @@ export function bpmPanel() {
 
 /* ---------- Chart ----------
    The image sits in a stage sized to exactly the chart's on-screen box, so the
-   marks layer on top of it covers the chart and nothing else. */
+   marks layer on top of it covers the chart and nothing else. A multi-page chart
+   is one PNG with the pages stacked; it is fitted per page and scrolls. */
 
 const VIEWPORT_PADDING = 8;
 
@@ -80,12 +81,16 @@ export function chartPanel(baseUrl, bandId) {
     function fit() {
         const ready = img.getAttribute('src') && img.complete && img.naturalWidth;
         if (!ready) {
-            stage.style.width = stage.style.height = '';
+            stage.style.width = stage.style.height = stage.style.maxHeight = '';
             return;
         }
         const w = viewport.clientWidth - 2 * VIEWPORT_PADDING;
         const h = viewport.clientHeight - 2 * VIEWPORT_PADDING;
-        const scale = Math.min(w / img.naturalWidth, h / img.naturalHeight);
+        // A chart of several A4 pages is one tall image, pages stacked. Fit one
+        // page like a single-page chart; the viewport scrolls to the others.
+        const pages = Math.max(1, Math.round(img.naturalHeight / (img.naturalWidth * Math.SQRT2)));
+        const scale = Math.min(w / img.naturalWidth, h / (img.naturalHeight / pages));
+        stage.style.maxHeight = pages > 1 ? 'none' : '';
         const width = Math.floor(img.naturalWidth * scale);
         const height = Math.floor(img.naturalHeight * scale);
         stage.style.width = `${width}px`;
@@ -120,6 +125,7 @@ export function chartPanel(baseUrl, bandId) {
         const url = assetUrl(baseUrl, song.chart);
         openLink.href = url;
         img.alt = `אקורדים: ${song.title}`;
+        if (current?.id !== song.id) viewport.scrollTop = 0;
         current = song;
         marks?.show(song);
         loadMarks();

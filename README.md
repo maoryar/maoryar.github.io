@@ -112,6 +112,13 @@ pdftoppm -png -r 200 -singlefile "Song.pdf" charts/<id>
 That gives 1653 × 2339, like the existing charts. Look at the result before
 uploading (Hebrew fonts can render wrong).
 
+A chart of several pages is still one PNG: render every page the same way
+(`pdftoppm -png -r 200 "Song.pdf" <dir>/p`) and stack them top to bottom, e.g.
+`ffmpeg -i <dir>/p-1.png -i <dir>/p-2.png -filter_complex vstack=inputs=2 charts/<id>.png`
+(two A4 pages: 1653 × 4678). The viewer counts the pages from the height
+(A4 proportions), fits one page to the screen like a one-page chart, and scrolls
+to the rest.
+
 **Remixes** are optional per song; a missing one shows an error in the player only
 when someone picks that version.
 
