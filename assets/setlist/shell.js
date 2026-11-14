@@ -76,6 +76,21 @@ const TEMPLATE = `
         <div class="player-title" id="player-title">—</div>
         <div class="player-time" id="player-time"></div>
     </div>
+    <button type="button" class="player-btn loop-btn" id="loop-btn" aria-pressed="false" disabled title="לולאה על קטע" aria-label="לולאה על קטע">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+    </button>
+    <!-- The loop's range on the song's timeline: two handles, the times, clear. -->
+    <div class="loop-row" id="loop-row" hidden>
+        <span class="loop-time" id="loop-a-time">0:00</span>
+        <div class="loop-track" id="loop-track">
+            <div class="loop-range" id="loop-range"></div>
+            <div class="loop-head" id="loop-head"></div>
+            <div class="loop-handle" id="loop-a" role="slider" tabindex="0" aria-label="תחילת הלולאה"><span class="loop-bubble"></span></div>
+            <div class="loop-handle" id="loop-b" role="slider" tabindex="0" aria-label="סוף הלולאה"><span class="loop-bubble"></span></div>
+        </div>
+        <span class="loop-time" id="loop-b-time">0:00</span>
+        <button type="button" class="loop-clear" id="loop-clear" title="בטל לולאה" aria-label="בטל לולאה">&times;</button>
+    </div>
 </div>
 
 <!-- One viewer dialog; the active panel (bpm / chart / lyrics) is swapped in. -->

@@ -450,6 +450,144 @@ main {
     font-variant-numeric: tabular-nums;
 }
 
+/* ---------- Section loop (loop.js) ----------
+   The loop button starts a 30 s loop; the bar then grows a second row with
+   the loop on the song's timeline. Handles: a thin bar drawn at the loop's
+   edge, with a 40 x 44 px touch area reaching outward (start: to the left,
+   end: to the right) so both stay grabbable on a short loop. */
+
+.player { flex-wrap: wrap; column-gap: 12px; }
+.player.looping { height: auto; padding-top: 6px; row-gap: 0; }
+.player.looping > .player-btn, .player.looping > .player-info { margin: 4px 0; }
+
+.loop-btn svg { width: 22px; height: 22px; }
+.loop-btn[aria-pressed="true"] { color: var(--accent-hover); background: rgba(230, 104, 60, 0.16); }
+.player-btn:disabled { opacity: 0.35; cursor: default; }
+.player-btn:disabled:hover { background: none; }
+
+.loop-row {
+    order: 10;
+    flex: 0 0 100%;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 44px;
+    direction: ltr;
+}
+.loop-row[hidden] { display: none; }
+
+.loop-time {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    min-width: 2.7em;
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent-hover);
+    font-variant-numeric: tabular-nums;
+}
+
+.loop-track {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 44px;
+    margin: 0 4px;
+    touch-action: none;
+    cursor: pointer;
+}
+.loop-track::before {
+    content: '';
+    position: absolute;
+    inset: 50% 0 auto;
+    height: 4px;
+    margin-top: -2px;
+    border-radius: 2px;
+    background: var(--border-strong);
+}
+
+.loop-range {
+    position: absolute;
+    top: 50%;
+    height: 10px;
+    margin-top: -5px;
+    border-radius: 3px;
+    background: rgba(230, 104, 60, 0.45);
+}
+
+.loop-head {
+    position: absolute;
+    top: 50%;
+    width: 2px;
+    height: 18px;
+    margin: -9px 0 0 -1px;
+    border-radius: 1px;
+    background: var(--text);
+    pointer-events: none;
+}
+
+.loop-handle {
+    position: absolute;
+    top: 0;
+    width: 40px;
+    height: 44px;
+    touch-action: none;
+    cursor: ew-resize;
+    outline: none;
+}
+#loop-a { transform: translateX(-100%); }
+.loop-handle::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    width: 8px;
+    height: 28px;
+    border-radius: 4px;
+    background: var(--accent-hover);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+#loop-a::before { right: -4px; }
+#loop-b::before { left: -4px; }
+.loop-handle:focus-visible::before, .loop-handle.dragging::before { background: #fff; }
+
+/* The time over the held handle. */
+.loop-bubble {
+    position: absolute;
+    bottom: calc(100% - 2px);
+    display: none;
+    padding: 3px 7px;
+    border-radius: 6px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    pointer-events: none;
+}
+#loop-a .loop-bubble { right: 0; transform: translateX(50%); }
+#loop-b .loop-bubble { left: 0; transform: translateX(-50%); }
+.loop-handle.dragging .loop-bubble { display: block; }
+
+.loop-clear {
+    position: relative;
+    z-index: 1;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+    background: var(--fill);
+    color: var(--text);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+/* Room for the taller bar. */
+body:has(.player.looping) { padding-bottom: calc(var(--player-h) + 50px + env(safe-area-inset-bottom) + 10px); }
+
 /* ---------- Mini player inside the viewer ----------
    viewer.js moves #player into the dialog while it is open (a modal dialog
    makes everything outside it unreachable). BPM and lyrics: a bar at the
@@ -462,6 +600,7 @@ main {
     height: calc(var(--player-h-docked) + env(safe-area-inset-bottom));
     background: var(--surface);
 }
+.viewer .player.looping { height: auto; }
 
 .viewer:not([data-kind="chart"]) {
     padding-bottom: calc(78px + var(--player-h-docked) + env(safe-area-inset-bottom));
@@ -469,6 +608,13 @@ main {
 
 .viewer:not([data-kind="chart"]) .viewer-nav {
     bottom: calc(14px + var(--player-h-docked) + env(safe-area-inset-bottom));
+}
+
+.viewer:not([data-kind="chart"]):has(.player.looping) {
+    padding-bottom: calc(128px + var(--player-h-docked) + env(safe-area-inset-bottom));
+}
+.viewer:not([data-kind="chart"]):has(.player.looping) .viewer-nav {
+    bottom: calc(64px + var(--player-h-docked) + env(safe-area-inset-bottom));
 }
 
 /* Wide screens: the nav pill sits at the right end of the player bar, as in
@@ -485,6 +631,12 @@ main {
         box-shadow: none;
     }
     .viewer:not([data-kind="chart"]) .player { padding-right: 190px; }
+    .viewer:not([data-kind="chart"]):has(.player.looping) {
+        padding-bottom: calc(70px + var(--player-h-docked) + env(safe-area-inset-bottom));
+    }
+    .viewer:not([data-kind="chart"]):has(.player.looping) .viewer-nav {
+        bottom: calc(3px + env(safe-area-inset-bottom));
+    }
 }
 
 /* ---------- Viewer dialog ---------- */
@@ -753,6 +905,8 @@ main {
     backdrop-filter: none;
 }
 .chart-footer .player-btn { padding: 4px; }
+.chart-footer .player.looping { height: auto; padding-top: 2px; }
+.chart-footer .player.looping > .player-btn, .chart-footer .player.looping > .player-info { margin: 2px 0; }
 
 /* Narrow screens (phone portrait): the player gets its own row above the
    zoom row; the nav pill stays on the zoom row. */

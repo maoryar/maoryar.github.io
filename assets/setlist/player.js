@@ -1,7 +1,7 @@
 /* Playback: one <audio> element walking the setlist.
  *
  * Emits on itself (EventTarget):
- *   'change'   song, play/pause state or repeat mode changed
+ *   'change'   song, play/pause state, repeat mode or loop changed
  *   'progress' playback position moved
  *   'error'    the current file failed to load
  */
@@ -13,6 +13,8 @@ export const REPEAT_MODES = [
     { id: 'all', label: 'חזרה על הסט', badge: '∞' },
 ];
 
+const LOOP_MIN_S = 1;           // the shortest loop
+
 export class Player extends EventTarget {
     constructor(audio, { songs, baseUrl }) {
         super();
@@ -23,9 +25,12 @@ export class Player extends EventTarget {
         this.version = 'original';
         this.repeatIdx = 0;
         this.pendingSeek = null;      // fraction to apply once metadata arrives
+        this.loop = null;             // { a, b } seconds: the section played over and over
+        this.loopTimer = 0;
+        this.dragging = false;        // a loop handle is held: don't jump yet
 
         const emit = (type) => () => this.dispatchEvent(new Event(type));
-        audio.addEventListener('play', emit('change'));
+        audio.addEventListener('play', () => { this.watchLoop(); this.dispatchEvent(new Event('change')); });
         audio.addEventListener('pause', emit('change'));
         audio.addEventListener('timeupdate', emit('progress'));
         audio.addEventListener('loadedmetadata', () => {
@@ -84,6 +89,7 @@ export class Player extends EventTarget {
         const song = this.songs[i];
         if (!song) return;
         if (i !== this.index) {
+            this.loop = null;          // a loop belongs to its song
             this.index = i;
             this.pendingSeek = null;
             this.audio.src = this.audioUrl(song);
@@ -153,7 +159,61 @@ export class Player extends EventTarget {
         this.dispatchEvent(new Event('change'));
     }
 
+    /* ---------- section loop ----------
+       Kept when the version changes (remixes have the original's length),
+       cleared when the song changes. */
+
+    get duration() {
+        const d = this.audio.duration;
+        return Number.isFinite(d) && d > 0 ? d : 0;
+    }
+
+    /** Start a loop: `length` seconds from the current position, clamped to
+     *  the song (near the end it starts earlier so it keeps its length). */
+    startLoop(length = 30) {
+        const d = this.duration;
+        if (this.index < 0 || !d) return;
+        const b = Math.min(this.audio.currentTime + length, d);
+        this.setLoop(Math.max(0, b - length), b);
+    }
+
+    /** Set the loop to a..b seconds. Unless `seek` is false (while a handle
+     *  is being dragged), a position outside it moves to its start. */
+    setLoop(a, b, { seek = true } = {}) {
+        const d = this.duration;
+        if (!d) return;
+        a = Math.max(0, Math.min(a, d));
+        b = Math.max(0, Math.min(b, d));
+        if (b - a < LOOP_MIN_S) return;
+        this.loop = { a, b };
+        const t = this.audio.currentTime;
+        if (seek && (t < a || t >= b)) this.audio.currentTime = a;
+        this.watchLoop();
+        this.dispatchEvent(new Event('change'));
+    }
+
+    clearLoop() {
+        if (!this.loop) return;
+        this.loop = null;
+        this.dispatchEvent(new Event('change'));
+    }
+
+    /** timeupdate comes only ~4 times a second, so a short timer watches the
+     *  loop's end while playing (a late jump would be heard). */
+    watchLoop() {
+        clearTimeout(this.loopTimer);
+        if (!this.loop || this.audio.paused) return;
+        const { a, b } = this.loop;
+        if (!this.dragging && this.audio.currentTime >= b - 0.02) this.audio.currentTime = a;
+        this.loopTimer = setTimeout(() => this.watchLoop(), 40);
+    }
+
     onEnded() {
+        if (this.loop) {               // the loop ran to the song's end
+            this.audio.currentTime = this.loop.a;
+            this.play();
+            return;
+        }
         const mode = this.repeat.id;
         if (mode === 'one') {
             this.audio.currentTime = 0;

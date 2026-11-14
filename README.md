@@ -28,6 +28,7 @@ assets/
     shell.js                  the setlist page markup, shared by every setlist page
     main.js                   entry: builds the page, loads the JSON, applies manager edits
     player.js                 playback (versions, repeat, seek, lock screen), skips disabled songs
+    loop.js                   section loop in the mini player: 30 s from here, two drag handles, clear
     viewer.js                 the full-screen viewer dialog: open/close, prev/next, swipe;
                               docks the mini player (always shown) inside it while open
     wakelock.js               keeps the screen on while a setlist page is visible

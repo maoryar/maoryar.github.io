@@ -2,6 +2,7 @@
  * loads its setlist JSON, and connects the song list to the player and viewer. */
 import { ICONS, byId, el, fetchOk, formatTime, svg } from './util.js';
 import { Player } from './player.js';
+import { bindLoopUi } from './loop.js';
 import { Viewer } from './viewer.js';
 import { bpmPanel, chartPanel, lyricsPanel } from './panels.js';
 import { readConfig, renderShell } from './shell.js';
@@ -112,6 +113,7 @@ function initPage(songs, baseUrl, bandId) {
     page = { songs, rows, player, viewer, editor: null };
 
     bindPlayerUi(player, rows, viewer);
+    bindLoopUi(player);
     bindToolbar(player);
 
     // Edits that arrived while the viewer or editor was open.
