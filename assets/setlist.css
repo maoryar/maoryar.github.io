@@ -7,11 +7,13 @@
 
 :root {
     --player-h: 68px;
+    /* The player's height in the viewer, where screen height is scarce. */
+    --player-h-docked: 56px;
 }
 
 body {
-    /* Room for the fixed mini player. */
-    padding-bottom: calc(var(--player-h) + 10px);
+    /* Room for the fixed mini player (always shown). */
+    padding-bottom: calc(var(--player-h) + env(safe-area-inset-bottom) + 10px);
 }
 
 /* ---------- Header ----------
@@ -397,20 +399,18 @@ main {
     position: fixed;
     inset: auto 0 0 0;
     z-index: 900;
-    height: var(--player-h);
+    height: calc(var(--player-h) + env(safe-area-inset-bottom));
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 0 14px;
-    padding-bottom: env(safe-area-inset-bottom);
+    padding: 0 max(14px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(14px, env(safe-area-inset-left));
     background: var(--surface-glass);
     backdrop-filter: blur(14px);
     border-top: 1px solid var(--border);
-    transform: translateY(100%);
-    transition: transform 0.3s var(--ease-out);
 }
 
-.player.visible { transform: none; }
+/* Idle: nothing loaded yet; the title names the song play would start. */
+.player.idle .player-title { color: var(--text-muted); font-weight: 500; }
 
 .player-btn {
     flex: none;
@@ -443,11 +443,48 @@ main {
 }
 
 .player-time {
+    unicode-bidi: plaintext;
+    text-align: left;
     font-size: 0.76rem;
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
-    direction: ltr;
-    text-align: start;
+}
+
+/* ---------- Mini player inside the viewer ----------
+   viewer.js moves #player into the dialog while it is open (a modal dialog
+   makes everything outside it unreachable). BPM and lyrics: a bar at the
+   bottom of the dialog, with the nav pill above it. Chart: part of the
+   footer row (see "Chart panel"). */
+
+.viewer .player {
+    position: absolute;
+    z-index: 1;   /* under the nav pill, which may sit on its row */
+    height: calc(var(--player-h-docked) + env(safe-area-inset-bottom));
+    background: var(--surface);
+}
+
+.viewer:not([data-kind="chart"]) {
+    padding-bottom: calc(78px + var(--player-h-docked) + env(safe-area-inset-bottom));
+}
+
+.viewer:not([data-kind="chart"]) .viewer-nav {
+    bottom: calc(14px + var(--player-h-docked) + env(safe-area-inset-bottom));
+}
+
+/* Wide screens: the nav pill sits at the right end of the player bar, as in
+   the chart footer, so the bar costs the panel no extra height. */
+@media (min-width: 700px) {
+    .viewer:not([data-kind="chart"]) {
+        padding-bottom: calc(20px + var(--player-h-docked) + env(safe-area-inset-bottom));
+    }
+    .viewer:not([data-kind="chart"]) .viewer-nav {
+        bottom: calc(3px + env(safe-area-inset-bottom));
+        left: auto;
+        right: max(8px, env(safe-area-inset-right));
+        transform: none;
+        box-shadow: none;
+    }
+    .viewer:not([data-kind="chart"]) .player { padding-right: 190px; }
 }
 
 /* ---------- Viewer dialog ---------- */
@@ -700,6 +737,32 @@ main {
 
 .chart-footer a { color: var(--accent-hover); font-size: 0.9rem; white-space: nowrap; }
 
+/* The docked player fills the footer's middle, between the zoom and the link. */
+.player-dock { flex: 1 1 auto; min-width: 0; display: flex; justify-content: center; }
+.player-dock:empty { display: none; }
+.chart-footer .player {
+    position: static;
+    flex: 0 1 420px;
+    min-width: 0;
+    height: 46px;
+    padding: 0 8px;
+    gap: 6px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--fill);
+    backdrop-filter: none;
+}
+.chart-footer .player-btn { padding: 4px; }
+
+/* Narrow screens (phone portrait): the player gets its own row above the
+   zoom row; the nav pill stays on the zoom row. */
+@media (max-width: 699px) {
+    .chart-footer { flex-wrap: wrap; row-gap: 6px; padding-right: 10px; }
+    .chart-footer .player-dock { order: -1; flex-basis: 100%; }
+    .chart-footer .player { flex-basis: 100%; height: 44px; }
+    .chart-footer a { margin-right: 166px; }
+}
+
 .chart-zoom { display: inline-flex; align-items: center; gap: 4px; }
 
 .chart-zoom-btn {
@@ -721,6 +784,7 @@ main {
 
 @media (max-width: 360px) {
     .chart-footer a { display: none; }
+    .chart-zoom { margin-right: 166px; }
 }
 
 /* ---------- Chart marks ---------- */
@@ -1033,4 +1097,14 @@ main {
     .play-btn { width: 31px; height: 31px; }
     .chip { width: 26px; height: 26px; }
     .chip.bpm { width: 30px; height: 30px; }
+}
+
+/* Short screens (phone landscape): a smaller BPM pulse so it all fits. */
+@media (max-height: 500px) {
+    .bpm-song { font-size: 1.3rem; margin-bottom: 0.2rem; }
+    .bpm-value { font-size: 2.6rem; }
+    .bpm-unit { margin-bottom: 0.6rem; }
+    .pulse-stage { width: 110px; height: 110px; margin-bottom: 0.7rem; }
+    .pulse-core { width: 60px; height: 60px; }
+    .bpm-hint { display: none; }
 }

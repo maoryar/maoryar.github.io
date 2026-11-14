@@ -4,6 +4,12 @@
  *   { el, has(song) -> bool, show(song), hide() }
  * and the viewer only handles opening, closing and walking the setlist
  * (buttons, arrow keys, swipe), skipping songs that lack that asset.
+ *
+ * Options:
+ *   dock      an element (the mini player) moved into the dialog while it is
+ *             open, so it stays usable above the modal: into the chart's
+ *             footer row for a chart, else to the bottom of the dialog.
+ *   onChange  called after the shown song or kind changes, and on close.
  */
 import { byId } from './util.js';
 
@@ -11,10 +17,13 @@ const SWIPE_MIN_PX = 50;     // horizontal travel needed for a swipe
 const SWIPE_RATIO = 1.5;     // must be this much more horizontal than vertical
 
 export class Viewer {
-    constructor(dialog, songs, panels) {
+    constructor(dialog, songs, panels, { dock = null, onChange = () => {} } = {}) {
         this.dialog = dialog;
         this.songs = songs;
         this.panels = panels;
+        this.dock = dock;
+        this.dockHome = dock && { parent: dock.parentNode, next: dock.nextSibling };
+        this.onChange = onChange;
         this.kind = null;
         this.index = -1;
 
@@ -60,6 +69,7 @@ export class Viewer {
         this.kind = kind;
         this.index = index;
         this.dialog.dataset.kind = kind;   // the chart takes the whole screen
+        this.placeDock(kind);
 
         if (!this.dialog.open) {
             this.dialog.showModal();
@@ -68,6 +78,16 @@ export class Viewer {
         // Shown before rendering so panels can measure themselves.
         panel.show(song);
         this.updateNav();
+        this.onChange();
+    }
+
+    /** Move the docked element where this kind wants it (before the panel
+     *  is shown, so the chart measures the space that is left). */
+    placeDock(kind) {
+        if (!this.dock) return;
+        const target = kind === 'chart' ? this.panels.chart?.el.querySelector('.player-dock') : null;
+        if (target) target.append(this.dock);
+        else this.dialog.append(this.dock);
     }
 
     close() {
@@ -80,6 +100,8 @@ export class Viewer {
         this.index = -1;
         delete this.dialog.dataset.kind;
         document.body.classList.remove('no-scroll');
+        if (this.dock) this.dockHome.parent.insertBefore(this.dock, this.dockHome.next);
+        this.onChange();
     }
 
     navigate(delta) {
@@ -111,9 +133,10 @@ export class Viewer {
 
         this.dialog.addEventListener('touchstart', (e) => {
             // Two fingers is a pinch, and an Apple Pencil draws: neither is a swipe.
-            // On a chart zoomed wider than the screen, one finger pans it.
+            // On a chart zoomed wider than the screen, one finger pans it; the
+            // docked player's buttons are not a swipe either.
             start = e.touches.length === 1 && e.touches[0].touchType !== 'stylus'
-                && !e.target.closest?.('.chart-viewport.pannable')
+                && !e.target.closest?.('.chart-viewport.pannable, .player')
                 ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
                 : null;
         }, { passive: true });

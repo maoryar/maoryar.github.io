@@ -62,8 +62,9 @@ const TEMPLATE = `
     <div class="last-updated" id="last-updated" hidden></div>
 </footer>
 
-<!-- Sticky mini player -->
-<div class="player" id="player">
+<!-- Mini player: always shown. The viewer docks it inside the dialog while
+     open (chart: in the footer row), so it stays above the modal. -->
+<div class="player idle" id="player">
     <button type="button" class="player-btn" id="player-prev" title="השיר הקודם" aria-label="השיר הקודם">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
     </button>
@@ -73,7 +74,7 @@ const TEMPLATE = `
     </button>
     <div class="player-info">
         <div class="player-title" id="player-title">—</div>
-        <div class="player-time" id="player-time">0:00 / 0:00</div>
+        <div class="player-time" id="player-time"></div>
     </div>
 </div>
 
@@ -99,13 +100,15 @@ const TEMPLATE = `
             <div class="chart-stage" id="chart-stage"><img id="chart-img" alt=""></div>
             <div class="chart-status" id="chart-status"></div>
         </div>
-        <!-- Zoom on the left, the file link on the right; the nav pill sits between. -->
+        <!-- Zoom on the left, the docked player, the file link, then the nav pill.
+             On a narrow screen the player takes its own row above. -->
         <div class="chart-footer">
             <div class="chart-zoom" role="group" aria-label="גודל התווים">
                 <button type="button" class="chart-zoom-btn" id="chart-zoom-out" title="הקטן" aria-label="הקטן">&minus;</button>
                 <button type="button" class="chart-zoom-btn chart-zoom-level" id="chart-zoom-reset" title="לרוחב המסך" aria-label="התאם לרוחב המסך">100%</button>
                 <button type="button" class="chart-zoom-btn" id="chart-zoom-in" title="הגדל" aria-label="הגדל">+</button>
             </div>
+            <div class="player-dock" id="chart-player-dock"></div>
             <a id="chart-open" href="#" target="_blank" rel="noopener noreferrer" title="פתח את הקובץ בלשונית חדשה">קובץ ↗</a>
         </div>
     </section>

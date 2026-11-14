@@ -100,6 +100,10 @@ function initPage(songs, baseUrl, bandId) {
         bpm: bpmPanel(),
         chart: counted(chartPanel(baseUrl, bandId), 'chart_open', bandId),
         lyrics: counted(lyricsPanel(baseUrl), 'lyrics_open', bandId),
+    }, {
+        dock: byId('player'),
+        // The idle player names the song it would start from.
+        onChange: () => player.dispatchEvent(new Event('change')),
     });
     countPlays(player, bandId);
 
@@ -107,7 +111,7 @@ function initPage(songs, baseUrl, bandId) {
     byId('song-list').replaceChildren(...rows.map((r) => r.li));
     page = { songs, rows, player, viewer, editor: null };
 
-    bindPlayerUi(player, rows);
+    bindPlayerUi(player, rows, viewer);
     bindToolbar(player);
 
     // Edits that arrived while the viewer or editor was open.
@@ -274,15 +278,21 @@ function setSeek(input, pct) {
 
 /* ---------- player UI ---------- */
 
-function bindPlayerUi(player, rows) {
+/** Where the idle player starts the set: the song open in the viewer (even a
+ *  disabled one: it was opened on purpose), else the first enabled song. Then
+ *  the set goes on with the main screen's repeat mode and version. */
+function startIndex(player, viewer) {
+    if (viewer.isOpen && player.songs[viewer.index]) return viewer.index;
+    return player.nextIndex(-1, 1);
+}
+
+function bindPlayerUi(player, rows, viewer) {
     const bar = byId('player');
     const title = byId('player-title');
     const time = byId('player-time');
     const toggle = byId('player-toggle');
     const repeatBtn = byId('repeat-btn');
-    let shownIndex = -1;
-
-    toggle.innerHTML = ICONS.play;
+    let failedIndex = -1;   // its title shows a load error until it loads or the song changes
 
     const paint = () => {
         const { index, playing, repeat } = player;
@@ -294,12 +304,20 @@ function bindPlayerUi(player, rows) {
             if (!isCurrent) setSeek(row.seek, 0);
         });
 
-        if (index >= 0 && index !== shownIndex) {
-            shownIndex = index;
+        // Always shown. Idle (nothing loaded yet): play starts the set from
+        // the song it names.
+        const idle = index < 0;
+        bar.classList.toggle('idle', idle);
+        if (idle) {
+            const start = player.songs[startIndex(player, viewer)];
+            title.textContent = start ? start.title : '—';
+            time.textContent = start ? 'לחצו ▶ לנגן מכאן' : '';
+        } else if (index !== failedIndex) {
             title.textContent = player.song.title;
-            bar.classList.add('visible');
+            paintTime();
         }
         toggle.innerHTML = playing ? ICONS.pause : ICONS.play;
+        toggle.setAttribute('aria-label', playing ? 'השהה' : 'נגן');
 
         byId('repeat-badge').textContent = repeat.badge;
         repeatBtn.setAttribute('aria-pressed', String(repeat.id !== 'off'));
@@ -307,21 +325,30 @@ function bindPlayerUi(player, rows) {
         repeatBtn.setAttribute('aria-label', repeat.label);
     };
 
+    const paintTime = () => {
+        const { currentTime, duration } = player.progress;
+        time.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+    };
+
     player.addEventListener('change', paint);
     player.addEventListener('progress', () => {
         const row = rows[player.index];
         if (!row) return;
-        const { currentTime, duration, fraction } = player.progress;
+        if (failedIndex === player.index) { failedIndex = -1; paint(); }   // it loaded after all
         // Don't fight the user's finger while they drag the bar.
-        if (!row.seek.matches(':active')) setSeek(row.seek, fraction * 100);
-        time.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+        if (!row.seek.matches(':active')) setSeek(row.seek, player.progress.fraction * 100);
+        paintTime();
     });
     player.addEventListener('error', () => {
+        failedIndex = player.index;
         title.textContent = `שגיאה בטעינת ${player.song.title}`;
-        shownIndex = -1;   // next change repaints the real title
     });
 
-    toggle.addEventListener('click', () => player.togglePlayback());
+    toggle.addEventListener('click', () => {
+        if (player.index >= 0) return player.togglePlayback();
+        const start = startIndex(player, viewer);
+        if (start >= 0) player.load(start, { autoplay: true });
+    });
     byId('player-prev').addEventListener('click', () => player.step(-1));
     byId('player-next').addEventListener('click', () => player.step(1));
 
