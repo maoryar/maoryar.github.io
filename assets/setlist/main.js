@@ -1,8 +1,8 @@
 /* Setlist page entry point: builds the page for the band declared on <body>,
  * loads its setlist JSON, and connects the song list to the player and viewer. */
-import { ICONS, byId, el, fetchOk, formatTime, svg } from './util.js';
+import { ICONS, byId, el, fetchOk, svg } from './util.js';
 import { Player } from './player.js';
-import { bindLoopUi } from './loop.js';
+import { bindTimeline } from './timeline.js';
 import { Viewer } from './viewer.js';
 import { bpmPanel, chartPanel, lyricsPanel } from './panels.js';
 import { readConfig, renderShell } from './shell.js';
@@ -113,7 +113,7 @@ function initPage(songs, baseUrl, bandId) {
     page = { songs, rows, player, viewer, editor: null };
 
     bindPlayerUi(player, rows, viewer);
-    bindLoopUi(player);
+    bindTimeline(player);
     bindToolbar(player);
 
     // Edits that arrived while the viewer or editor was open.
@@ -315,8 +315,7 @@ function bindPlayerUi(player, rows, viewer) {
             title.textContent = start ? start.title : '—';
             time.textContent = start ? 'לחצו ▶ לנגן מכאן' : '';
         } else if (index !== failedIndex) {
-            title.textContent = player.song.title;
-            paintTime();
+            title.textContent = player.song.title;   // the times are on the timeline
         }
         toggle.innerHTML = playing ? ICONS.pause : ICONS.play;
         toggle.setAttribute('aria-label', playing ? 'השהה' : 'נגן');
@@ -327,11 +326,6 @@ function bindPlayerUi(player, rows, viewer) {
         repeatBtn.setAttribute('aria-label', repeat.label);
     };
 
-    const paintTime = () => {
-        const { currentTime, duration } = player.progress;
-        time.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
-    };
-
     player.addEventListener('change', paint);
     player.addEventListener('progress', () => {
         const row = rows[player.index];
@@ -339,7 +333,6 @@ function bindPlayerUi(player, rows, viewer) {
         if (failedIndex === player.index) { failedIndex = -1; paint(); }   // it loaded after all
         // Don't fight the user's finger while they drag the bar.
         if (!row.seek.matches(':active')) setSeek(row.seek, player.progress.fraction * 100);
-        paintTime();
     });
     player.addEventListener('error', () => {
         failedIndex = player.index;

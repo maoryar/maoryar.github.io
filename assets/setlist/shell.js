@@ -65,31 +65,39 @@ const TEMPLATE = `
 <!-- Mini player: always shown. The viewer docks it inside the dialog while
      open (chart: in the footer row), so it stays above the modal. -->
 <div class="player idle" id="player">
-    <button type="button" class="player-btn" id="player-prev" title="השיר הקודם" aria-label="השיר הקודם">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-    </button>
-    <button type="button" class="player-btn main" id="player-toggle" title="נגן / השהה" aria-label="נגן או השהה"></button>
-    <button type="button" class="player-btn" id="player-next" title="השיר הבא" aria-label="השיר הבא">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg>
-    </button>
-    <div class="player-info">
-        <div class="player-title" id="player-title">—</div>
-        <div class="player-time" id="player-time"></div>
+    <div class="player-start">
+        <div class="player-controls">
+            <button type="button" class="player-btn" id="player-prev" title="השיר הקודם" aria-label="השיר הקודם">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+            </button>
+            <button type="button" class="player-btn main" id="player-toggle" title="נגן / השהה" aria-label="נגן או השהה"></button>
+            <button type="button" class="player-btn" id="player-next" title="השיר הבא" aria-label="השיר הבא">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg>
+            </button>
+        </div>
+        <div class="player-info">
+            <div class="player-title" id="player-title">—</div>
+            <div class="player-time" id="player-time"></div>
+        </div>
     </div>
-    <button type="button" class="player-btn loop-btn" id="loop-btn" aria-pressed="false" disabled title="לולאה על קטע" aria-label="לולאה על קטע">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
-    </button>
-    <!-- The loop's range on the song's timeline: two handles, the times, clear. -->
-    <div class="loop-row" id="loop-row" hidden>
-        <span class="loop-time" id="loop-a-time">0:00</span>
-        <div class="loop-track" id="loop-track">
+    <!-- The song's timeline: tap or drag to seek. A loop adds its range and
+         two handles (timeline.js). -->
+    <div class="timeline disabled" id="timeline">
+        <span class="tl-time" id="tl-elapsed">0:00</span>
+        <div class="tl-track" id="tl-track" role="slider" tabindex="0" aria-label="מיקום בשיר" aria-valuemin="0">
+            <div class="tl-fill" id="tl-fill"></div>
             <div class="loop-range" id="loop-range"></div>
-            <div class="loop-head" id="loop-head"></div>
+            <div class="tl-thumb" id="tl-thumb"></div>
             <div class="loop-handle" id="loop-a" role="slider" tabindex="0" aria-label="תחילת הלולאה"><span class="loop-bubble"></span></div>
             <div class="loop-handle" id="loop-b" role="slider" tabindex="0" aria-label="סוף הלולאה"><span class="loop-bubble"></span></div>
         </div>
-        <span class="loop-time" id="loop-b-time">0:00</span>
+        <span class="tl-time" id="tl-total">0:00</span>
         <button type="button" class="loop-clear" id="loop-clear" title="בטל לולאה" aria-label="בטל לולאה">&times;</button>
+    </div>
+    <div class="player-end">
+        <button type="button" class="player-btn loop-btn" id="loop-btn" aria-pressed="false" disabled title="לולאה על קטע" aria-label="לולאה על קטע">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+        </button>
     </div>
 </div>
 

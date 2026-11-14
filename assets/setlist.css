@@ -6,9 +6,15 @@
  * unicode-bidi: plaintext so Hebrew and English titles each read naturally. */
 
 :root {
+    /* The mini player: one row on wide screens (timeline in the middle), two
+       on narrow ones (timeline below the buttons). In the viewer, where height
+       is scarce, a little lower. */
     --player-h: 68px;
-    /* The player's height in the viewer, where screen height is scarce. */
     --player-h-docked: 56px;
+}
+
+@media (max-width: 699px) {
+    :root { --player-h: 100px; --player-h-docked: 96px; }
 }
 
 body {
@@ -392,7 +398,10 @@ main {
     opacity: 0.85;
 }
 
-/* ---------- Mini player ---------- */
+/* ---------- Mini player ----------
+   Always shown. A grid: [prev play next, title] [timeline] [loop button].
+   The side columns are equal, so the timeline sits in the middle of the bar.
+   Narrow screens: buttons and title on top, the timeline below at full width. */
 
 .player {
     direction: ltr;
@@ -400,17 +409,29 @@ main {
     inset: auto 0 0 0;
     z-index: 900;
     height: calc(var(--player-h) + env(safe-area-inset-bottom));
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 40%) minmax(0, 1fr);
+    grid-template-areas: "start timeline end";
     align-items: center;
-    gap: 12px;
+    column-gap: 16px;
     padding: 0 max(14px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(14px, env(safe-area-inset-left));
     background: var(--surface-glass);
     backdrop-filter: blur(14px);
     border-top: 1px solid var(--border);
 }
 
-/* Idle: nothing loaded yet; the title names the song play would start. */
-.player.idle .player-title { color: var(--text-muted); font-weight: 500; }
+.player-start { grid-area: start; display: flex; align-items: center; gap: 10px; min-width: 0; }
+.player-controls { flex: none; display: flex; align-items: center; gap: 4px; }
+.player-end { grid-area: end; display: flex; align-items: center; min-width: 0; }
+
+@media (max-width: 699px) {
+    .player {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: "start end" "timeline timeline";
+        align-content: center;
+        row-gap: 2px;
+    }
+}
 
 .player-btn {
     flex: none;
@@ -429,6 +450,8 @@ main {
 .player-btn:hover { background: rgba(255, 255, 255, 0.12); }
 .player-btn svg { width: 20px; height: 20px; fill: currentColor; }
 .player-btn.main svg { width: 26px; height: 26px; }
+.player-btn:disabled { opacity: 0.35; cursor: default; }
+.player-btn:disabled:hover { background: none; }
 
 .player-info { flex: 1 1 auto; min-width: 0; }
 
@@ -442,53 +465,53 @@ main {
     text-overflow: ellipsis;
 }
 
+/* Under the title: the idle hint, or the loop's range. */
 .player-time {
     unicode-bidi: plaintext;
     text-align: left;
     font-size: 0.76rem;
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+.player-time:empty { display: none; }
+.player.looping .player-time { color: var(--accent-hover); }
 
-/* ---------- Section loop (loop.js) ----------
-   The loop button starts a 30 s loop; the bar then grows a second row with
-   the loop on the song's timeline. Handles: a thin bar drawn at the loop's
-   edge, with a 40 x 44 px touch area reaching outward (start: to the left,
-   end: to the right) so both stay grabbable on a short loop. */
-
-.player { flex-wrap: wrap; column-gap: 12px; }
-.player.looping { height: auto; padding-top: 6px; row-gap: 0; }
-.player.looping > .player-btn, .player.looping > .player-info { margin: 4px 0; }
+/* Idle: nothing loaded yet; the title names the song play would start. */
+.player.idle .player-title { color: var(--text-muted); font-weight: 500; }
 
 .loop-btn svg { width: 22px; height: 22px; }
 .loop-btn[aria-pressed="true"] { color: var(--accent-hover); background: rgba(230, 104, 60, 0.16); }
-.player-btn:disabled { opacity: 0.35; cursor: default; }
-.player-btn:disabled:hover { background: none; }
 
-.loop-row {
-    order: 10;
-    flex: 0 0 100%;
+/* ---------- Timeline (timeline.js) ----------
+   Elapsed, the track, total; with a loop also its range, two handles and a
+   clear button. Handles: a thin bar drawn at the loop's edge, with a
+   40 x 44 px touch area reaching outward (start: to the left, end: to the
+   right) so both stay grabbable on a short loop. */
+
+.timeline {
+    grid-area: timeline;
     display: flex;
     align-items: center;
     gap: 6px;
+    min-width: 0;
     height: 44px;
-    direction: ltr;
 }
-.loop-row[hidden] { display: none; }
 
-.loop-time {
+.tl-time {
     position: relative;
     z-index: 1;
     flex: none;
     min-width: 2.7em;
     text-align: center;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--accent-hover);
+    font-size: 0.76rem;
+    color: var(--text-muted);
     font-variant-numeric: tabular-nums;
 }
 
-.loop-track {
+.tl-track {
     position: relative;
     flex: 1 1 auto;
     min-width: 0;
@@ -496,8 +519,9 @@ main {
     margin: 0 4px;
     touch-action: none;
     cursor: pointer;
+    outline: none;
 }
-.loop-track::before {
+.tl-track::before {
     content: '';
     position: absolute;
     inset: 50% 0 auto;
@@ -507,6 +531,43 @@ main {
     background: var(--border-strong);
 }
 
+.tl-fill {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 4px;
+    margin-top: -2px;
+    border-radius: 2px;
+    background: var(--text-muted);
+    pointer-events: none;
+}
+
+.tl-thumb {
+    position: absolute;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    border-radius: 50%;
+    background: var(--text);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+    z-index: 2;   /* over the loop handles: the position stays visible */
+    transition: transform 0.1s ease;
+}
+.timeline.seeking .tl-thumb, .tl-track:focus-visible .tl-thumb { transform: scale(1.35); }
+
+/* No song loaded: an empty, inactive line. */
+.timeline.disabled .tl-track { cursor: default; }
+.timeline.disabled .tl-thumb, .timeline.disabled .tl-fill { display: none; }
+.timeline.disabled .tl-time { opacity: 0.45; }
+
+/* The loop's parts show only while looping. */
+.loop-range, .loop-handle, .loop-clear { display: none; }
+.player.looping .loop-range, .player.looping .loop-handle { display: block; }
+.player.looping .loop-clear { display: inline-block; }
+.player.looping .tl-time { color: var(--text); }
+
 .loop-range {
     position: absolute;
     top: 50%;
@@ -514,22 +575,13 @@ main {
     margin-top: -5px;
     border-radius: 3px;
     background: rgba(230, 104, 60, 0.45);
-}
-
-.loop-head {
-    position: absolute;
-    top: 50%;
-    width: 2px;
-    height: 18px;
-    margin: -9px 0 0 -1px;
-    border-radius: 1px;
-    background: var(--text);
     pointer-events: none;
 }
 
 .loop-handle {
     position: absolute;
     top: 0;
+    z-index: 1;
     width: 40px;
     height: 44px;
     touch-action: none;
@@ -574,25 +626,21 @@ main {
     position: relative;
     z-index: 1;
     flex: none;
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     border: 1px solid var(--border-strong);
     border-radius: 50%;
     background: var(--fill);
     color: var(--text);
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     line-height: 1;
     cursor: pointer;
 }
 
-/* Room for the taller bar. */
-body:has(.player.looping) { padding-bottom: calc(var(--player-h) + 50px + env(safe-area-inset-bottom) + 10px); }
-
 /* ---------- Mini player inside the viewer ----------
    viewer.js moves #player into the dialog while it is open (a modal dialog
-   makes everything outside it unreachable). BPM and lyrics: a bar at the
-   bottom of the dialog, with the nav pill above it. Chart: part of the
-   footer row (see "Chart panel"). */
+   makes everything outside it unreachable). BPM and lyrics: the same bar at
+   the bottom of the dialog. Chart: part of the footer row (see "Chart panel"). */
 
 .viewer .player {
     position: absolute;
@@ -600,7 +648,6 @@ body:has(.player.looping) { padding-bottom: calc(var(--player-h) + 50px + env(sa
     height: calc(var(--player-h-docked) + env(safe-area-inset-bottom));
     background: var(--surface);
 }
-.viewer .player.looping { height: auto; }
 
 .viewer:not([data-kind="chart"]) {
     padding-bottom: calc(78px + var(--player-h-docked) + env(safe-area-inset-bottom));
@@ -610,33 +657,20 @@ body:has(.player.looping) { padding-bottom: calc(var(--player-h) + 50px + env(sa
     bottom: calc(14px + var(--player-h-docked) + env(safe-area-inset-bottom));
 }
 
-.viewer:not([data-kind="chart"]):has(.player.looping) {
-    padding-bottom: calc(128px + var(--player-h-docked) + env(safe-area-inset-bottom));
-}
-.viewer:not([data-kind="chart"]):has(.player.looping) .viewer-nav {
-    bottom: calc(64px + var(--player-h-docked) + env(safe-area-inset-bottom));
-}
-
-/* Wide screens: the nav pill sits at the right end of the player bar, as in
-   the chart footer, so the bar costs the panel no extra height. */
+/* Wide screens: the nav pill sits at the right end of the bar (in its right
+   column, so the timeline stays centred) and costs the panel no height. */
 @media (min-width: 700px) {
     .viewer:not([data-kind="chart"]) {
         padding-bottom: calc(20px + var(--player-h-docked) + env(safe-area-inset-bottom));
     }
     .viewer:not([data-kind="chart"]) .viewer-nav {
-        bottom: calc(3px + env(safe-area-inset-bottom));
+        bottom: calc((var(--player-h-docked) - 50px) / 2 + env(safe-area-inset-bottom));
         left: auto;
         right: max(8px, env(safe-area-inset-right));
         transform: none;
         box-shadow: none;
     }
-    .viewer:not([data-kind="chart"]) .player { padding-right: 190px; }
-    .viewer:not([data-kind="chart"]):has(.player.looping) {
-        padding-bottom: calc(70px + var(--player-h-docked) + env(safe-area-inset-bottom));
-    }
-    .viewer:not([data-kind="chart"]):has(.player.looping) .viewer-nav {
-        bottom: calc(3px + env(safe-area-inset-bottom));
-    }
+    .viewer:not([data-kind="chart"]) .player-end { padding-right: 176px; }
 }
 
 /* ---------- Viewer dialog ---------- */
@@ -889,31 +923,40 @@ body:has(.player.looping) { padding-bottom: calc(var(--player-h) + 50px + env(sa
 
 .chart-footer a { color: var(--accent-hover); font-size: 0.9rem; white-space: nowrap; }
 
-/* The docked player fills the footer's middle, between the zoom and the link. */
+/* The docked player fills the footer's middle, between the zoom and the link:
+   buttons on the left, loop button on the right, and between them the title
+   (small) over the timeline. */
 .player-dock { flex: 1 1 auto; min-width: 0; display: flex; justify-content: center; }
 .player-dock:empty { display: none; }
 .chart-footer .player {
     position: static;
-    flex: 0 1 420px;
+    flex: 0 1 520px;
     min-width: 0;
-    height: 46px;
-    padding: 0 8px;
-    gap: 6px;
+    height: auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "controls info end" "controls timeline end";
+    row-gap: 0;
+    column-gap: 6px;
+    padding: 3px 6px 0;
     border: 1px solid var(--border);
     border-radius: 12px;
     background: var(--fill);
     backdrop-filter: none;
 }
+.chart-footer .player-start { display: contents; }
+.chart-footer .player-controls { grid-area: controls; gap: 0; }
+.chart-footer .player-info { grid-area: info; min-width: 0; padding: 0 6px; }
+.chart-footer .player-title { font-size: 0.74rem; line-height: 1.2; }
+.chart-footer .player-time { display: none; }
 .chart-footer .player-btn { padding: 4px; }
-.chart-footer .player.looping { height: auto; padding-top: 2px; }
-.chart-footer .player.looping > .player-btn, .chart-footer .player.looping > .player-info { margin: 2px 0; }
+.chart-footer .loop-clear { width: 28px; height: 28px; font-size: 1rem; }
 
 /* Narrow screens (phone portrait): the player gets its own row above the
    zoom row; the nav pill stays on the zoom row. */
 @media (max-width: 699px) {
     .chart-footer { flex-wrap: wrap; row-gap: 6px; padding-right: 10px; }
     .chart-footer .player-dock { order: -1; flex-basis: 100%; }
-    .chart-footer .player { flex-basis: 100%; height: 44px; }
+    .chart-footer .player { flex-basis: 100%; }
     .chart-footer a { margin-right: 166px; }
 }
 
