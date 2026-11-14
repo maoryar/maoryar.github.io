@@ -41,7 +41,7 @@ export function bindTimeline(player) {
         button.setAttribute('aria-pressed', String(!!loop));
         bar.classList.toggle('looping', !!loop);
 
-        const now = seekingTo ?? player.audio.currentTime;
+        const now = seekingTo ?? player.position;
         elapsed.textContent = formatTime(ready ? now : 0);
         total.textContent = formatTime(ready ? d : 0);
         const at = ready ? pct(now, d) : '0%';

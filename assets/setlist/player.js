@@ -28,12 +28,14 @@ export class Player extends EventTarget {
         this.loop = null;             // { a, b } seconds: the section played over and over
         this.loopTimer = 0;
         this.dragging = false;        // a loop handle is held: don't jump yet
+        this.knownDuration = 0;       // the song's length, kept while another version loads
 
         const emit = (type) => () => this.dispatchEvent(new Event(type));
         audio.addEventListener('play', () => { this.watchLoop(); this.dispatchEvent(new Event('change')); });
         audio.addEventListener('pause', emit('change'));
         audio.addEventListener('timeupdate', emit('progress'));
         audio.addEventListener('loadedmetadata', () => {
+            if (Number.isFinite(audio.duration) && audio.duration > 0) this.knownDuration = audio.duration;
             if (this.pendingSeek != null) {
                 audio.currentTime = audio.duration * this.pendingSeek;
                 this.pendingSeek = null;
@@ -90,6 +92,7 @@ export class Player extends EventTarget {
         if (!song) return;
         if (i !== this.index) {
             this.loop = null;          // a loop belongs to its song
+            this.knownDuration = 0;
             this.index = i;
             this.pendingSeek = null;
             this.audio.src = this.audioUrl(song);
@@ -163,9 +166,17 @@ export class Player extends EventTarget {
        Kept when the version changes (remixes have the original's length),
        cleared when the song changes. */
 
+    /** The song's length; while a version switch loads the new file, the
+     *  length already known (remixes have the original's length), so the
+     *  timeline and the loop don't blink. */
     get duration() {
         const d = this.audio.duration;
-        return Number.isFinite(d) && d > 0 ? d : 0;
+        return Number.isFinite(d) && d > 0 ? d : this.knownDuration;
+    }
+
+    /** The position to show: a pending seek (version switch) counts already. */
+    get position() {
+        return this.pendingSeek != null ? this.pendingSeek * this.duration : this.audio.currentTime;
     }
 
     /** Start a loop: `length` seconds from the current position, clamped to
