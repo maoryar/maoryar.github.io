@@ -14,6 +14,7 @@ import { API } from '../api.js';
 import { askManagerPassword, managerPassword } from '../manager.js';
 import { SCENE_WIDTH, toObject, touches } from './ink.js';
 import { MarksStore, chartId, newId } from './store.js';
+import { trackDraw } from '../usage.js';
 
 const LAYERS = ['mine', 'band'];
 const LAYER_NAMES = { mine: 'שלי', band: 'להקה' };
@@ -212,6 +213,7 @@ export function createMarks({ stage, bar, band }) {
 
     function addStroke(layer, data) {
         const stroke = { id: newId(), data };
+        if (key) trackDraw(key.band, key.song);
         if (apply(layer, { add: [stroke] })) {
             undoStack().push({ op: 'add', layer, stroke });
             updateBar();

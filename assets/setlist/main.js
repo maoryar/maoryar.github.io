@@ -7,6 +7,7 @@ import { bpmPanel, chartPanel, lyricsPanel } from './panels.js';
 import { readConfig, renderShell } from './shell.js';
 import { keepScreenOn } from './wakelock.js';
 import { EMPTY, applyEdits, cachedEdits, fetchEdits } from './order.js';
+import { track } from './usage.js';
 
 // Without a cached copy, wait this long for the manager's edits before
 // showing the JSON order (the API can be slow to wake up).
@@ -30,6 +31,7 @@ async function start() {
     }
 
     const band = config.bandId;
+    track('page_view', { band });
     const fresh = fetchEdits(band);
     let data;
     try {
@@ -96,9 +98,10 @@ function initPage(songs, baseUrl, bandId) {
     const player = new Player(byId('audio'), { songs, baseUrl });
     const viewer = new Viewer(byId('viewer'), songs, {
         bpm: bpmPanel(),
-        chart: chartPanel(baseUrl, bandId),
-        lyrics: lyricsPanel(baseUrl),
+        chart: counted(chartPanel(baseUrl, bandId), 'chart_open', bandId),
+        lyrics: counted(lyricsPanel(baseUrl), 'lyrics_open', bandId),
     });
+    countPlays(player, bandId);
 
     const rows = songs.map((song, i) => renderRow(song, i, { player, viewer }));
     byId('song-list').replaceChildren(...rows.map((r) => r.li));
@@ -152,6 +155,28 @@ function initPage(songs, baseUrl, bandId) {
 
     // Rows are rendered after load, so the browser can't jump to #song-<id> itself.
     if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: 'center' });
+}
+
+/* ---------- usage counts (anonymous, see usage.js) ---------- */
+
+/** A panel whose every shown song counts as opened. */
+function counted(panel, event, band) {
+    const show = panel.show;
+    return { ...panel, show: (song) => { track(event, { band, song: song.id }); return show(song); } };
+}
+
+/** One play per song and version: resuming after a pause doesn't count again. */
+function countPlays(player, band) {
+    let last = null;
+    player.audio.addEventListener('play', () => {
+        const song = player.song;
+        if (!song) return;
+        const now = `${song.id}|${player.version}|${player.audio.src}`;
+        if (now === last) return;
+        last = now;
+        if (player.version === 'original') track('audio_play', { band, song: song.id });
+        else track('remix_play', { band, song: song.id, version: player.version });
+    });
 }
 
 /* ---------- song rows ---------- */

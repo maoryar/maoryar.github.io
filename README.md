@@ -35,6 +35,7 @@ assets/
     api.js                    backend address: test stage on http (local), production on https
     manager.js                the manager password prompt (band marks and setlist editing)
     order.js                  manager edits (order, BPM, disabled songs) applied over the JSON
+    usage.js                  anonymous usage counts (see "Usage counts")
     editor.js                 setlist edit mode: drag to reorder, change BPM, swipe to disable
     marks/                    drawing on charts: Mine (this device) and Band (shared) layers
       marks.js                toolbar and input; only a Pencil or mouse draws, fingers scroll
@@ -56,12 +57,26 @@ laid out left to right: play on the left, song tools on the right.
 | Song order, BPM changes, disabled songs | the backend, per band | the manager, on the page |
 | Band chart marks | the backend, per band + song + chart | anyone with the manager password, on the page |
 | "Mine" chart marks | the device's browser storage | the device |
+| Usage counts | the backend (kept a year) | sent by the pages |
 
 Manager edits sit **on top of** the JSON. Two consequences:
 - A BPM the manager changed on the page wins over the JSON. Changing that song's
   `bpm` in the JSON has no visible effect until the manager resets it.
 - A new song in the JSON appears at the end of the manager's order. Removing a
   song from the JSON removes it from the page, whatever the manager saved.
+
+## Usage counts
+
+The setlist pages count, anonymously, what is opened and played: page view, chart
+or lyrics opened, a recording or remix played, drawing on a chart (once per chart
+per session). No cookies, no third party, no names and no IP addresses: each
+browser keeps a random id in `localStorage` (`usage:device`), and an event carries
+only that id, the band, the song, the time, a coarse device class (iPhone, iPad,
+Mac, Android, other; worked out on the device, the user agent itself is not sent)
+and whether the page runs as a Home Screen app. Events are sent to the site's own
+backend in the background, queued while offline, and any failure is silent, so
+the page never waits for it. Automated browsers are not counted. Clearing the
+site's data gives the browser a new id.
 
 ## Updating songs
 
