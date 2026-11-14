@@ -59,6 +59,7 @@ export class Viewer {
 
         this.kind = kind;
         this.index = index;
+        this.dialog.dataset.kind = kind;   // the chart takes the whole screen
 
         if (!this.dialog.open) {
             this.dialog.showModal();
@@ -77,6 +78,7 @@ export class Viewer {
         if (this.kind) this.panels[this.kind].hide();
         this.kind = null;
         this.index = -1;
+        delete this.dialog.dataset.kind;
         document.body.classList.remove('no-scroll');
     }
 
@@ -109,7 +111,9 @@ export class Viewer {
 
         this.dialog.addEventListener('touchstart', (e) => {
             // Two fingers is a pinch, and an Apple Pencil draws: neither is a swipe.
+            // On a chart zoomed wider than the screen, one finger pans it.
             start = e.touches.length === 1 && e.touches[0].touchType !== 'stylus'
+                && !e.target.closest?.('.chart-viewport.pannable')
                 ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
                 : null;
         }, { passive: true });

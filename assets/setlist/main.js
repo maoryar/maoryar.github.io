@@ -5,6 +5,7 @@ import { Player } from './player.js';
 import { Viewer } from './viewer.js';
 import { bpmPanel, chartPanel, lyricsPanel } from './panels.js';
 import { readConfig, renderShell } from './shell.js';
+import { keepScreenOn } from './wakelock.js';
 import { EMPTY, applyEdits, cachedEdits, fetchEdits } from './order.js';
 
 // Without a cached copy, wait this long for the manager's edits before
@@ -13,6 +14,7 @@ const FIRST_EDITS_WAIT_MS = 1500;
 
 const config = readConfig();
 renderShell(config);
+keepScreenOn();   // a chart on the music stand must not go dark
 
 const status = byId('status');
 

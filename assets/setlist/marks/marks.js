@@ -22,6 +22,7 @@ const HIGHLIGHT = '#facc15';
 const SIZES = { pen: 4, highlighter: 22, text: 26 };
 const ERASER_RADIUS = 8;
 const REFRESH_MS = 20000;
+const MAX_CANVAS_PIXELS = 8e6;   // well under iOS's per-canvas limit (16.7 M)
 const HEBREW = /[֐-׿]/;
 
 const ICON = {
@@ -51,7 +52,8 @@ export function createMarks({ stage, bar, band }) {
 
     const canvasEl = el('canvas', { class: 'marks-canvas', attrs: { 'aria-hidden': 'true' } });
     stage.append(canvasEl);
-    const canvas = new StaticCanvas(canvasEl, { renderOnAddRemove: false, enableRetinaScaling: true });
+    // Resolution is managed in resize(), not by Fabric's retina scaling.
+    const canvas = new StaticCanvas(canvasEl, { renderOnAddRemove: false, enableRetinaScaling: false });
 
     let key = null;           // { band, song, chart } of the chart on screen
     let editing = false;      // tools open
@@ -427,8 +429,14 @@ export function createMarks({ stage, bar, band }) {
         resize(width, height) {
             if (!width || !height) return;
             scale = width / SCENE_WIDTH;
-            canvas.setDimensions({ width, height });
-            canvas.setViewportTransform([scale, 0, 0, scale, 0, 0]);
+            // Sharp on a Retina screen, but a zoomed multi-page chart would make a
+            // canvas bigger than iOS allows (it then shows nothing), so the pixel
+            // count is capped and the marks get a little softer instead.
+            const ratio = Math.min(Math.max(window.devicePixelRatio || 1, 1),
+                Math.sqrt(MAX_CANVAS_PIXELS / (width * height)));
+            canvas.setDimensions({ width: Math.round(width * ratio), height: Math.round(height * ratio) }, { backstoreOnly: true });
+            canvas.setDimensions({ width: `${width}px`, height: `${height}px` }, { cssOnly: true });
+            canvas.setViewportTransform([scale * ratio, 0, 0, scale * ratio, 0, 0]);
             canvas.requestRenderAll();
         },
 

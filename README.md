@@ -29,7 +29,8 @@ assets/
     main.js                   entry: builds the page, loads the JSON, applies manager edits
     player.js                 playback (versions, repeat, seek, lock screen), skips disabled songs
     viewer.js                 the full-screen viewer dialog: open/close, prev/next, swipe
-    panels.js                 the three viewer panels: BPM, chart, lyrics
+    wakelock.js               keeps the screen on while a setlist page is visible
+    panels.js                 the three viewer panels: BPM, chart (fit to width, own zoom), lyrics
     util.js                   small helpers
     api.js                    backend address: test stage on http (local), production on https
     manager.js                the manager password prompt (band marks and setlist editing)
@@ -115,9 +116,11 @@ uploading (Hebrew fonts can render wrong).
 A chart of several pages is still one PNG: render every page the same way
 (`pdftoppm -png -r 200 "Song.pdf" <dir>/p`) and stack them top to bottom, e.g.
 `ffmpeg -i <dir>/p-1.png -i <dir>/p-2.png -filter_complex vstack=inputs=2 charts/<id>.png`
-(two A4 pages: 1653 × 4678). The viewer counts the pages from the height
-(A4 proportions), fits one page to the screen like a one-page chart, and scrolls
-to the rest.
+(two A4 pages: 1653 × 4678). The viewer fits a chart to the screen's width and
+scrolls down to the rest. It has its own zoom (pinch with two fingers, or the
+−/100%/+ buttons; the smallest zoom fits one whole A4 page, counted from the
+height) that scales the image and the marks layer together, so drawing works at
+any zoom; marks are stored in chart units. The zoom level is kept per device.
 
 **Remixes** are optional per song; a missing one shows an error in the player only
 when someone picks that version.

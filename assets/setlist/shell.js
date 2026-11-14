@@ -99,8 +99,14 @@ const TEMPLATE = `
             <div class="chart-stage" id="chart-stage"><img id="chart-img" alt=""></div>
             <div class="chart-status" id="chart-status"></div>
         </div>
+        <!-- Zoom on the left, the file link on the right; the nav pill sits between. -->
         <div class="chart-footer">
-            <a id="chart-open" href="#" target="_blank" rel="noopener noreferrer">פתח את הקובץ בלשונית חדשה ↗</a>
+            <div class="chart-zoom" role="group" aria-label="גודל התווים">
+                <button type="button" class="chart-zoom-btn" id="chart-zoom-out" title="הקטן" aria-label="הקטן">&minus;</button>
+                <button type="button" class="chart-zoom-btn chart-zoom-level" id="chart-zoom-reset" title="לרוחב המסך" aria-label="התאם לרוחב המסך">100%</button>
+                <button type="button" class="chart-zoom-btn" id="chart-zoom-in" title="הגדל" aria-label="הגדל">+</button>
+            </div>
+            <a id="chart-open" href="#" target="_blank" rel="noopener noreferrer" title="פתח את הקובץ בלשונית חדשה">קובץ ↗</a>
         </div>
     </section>
 

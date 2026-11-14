@@ -612,20 +612,31 @@ main {
 
 /* ---------- Chart panel ---------- */
 
+/* The chart takes the whole screen: no dialog padding, and the nav pill sits
+   at the right end of the footer row (zoom on the left, the file link between). */
+.viewer[data-kind="chart"] { padding: 0; }
+.viewer[data-kind="chart"] .viewer-close { top: 4px; left: 6px; }
+.viewer[data-kind="chart"] .viewer-nav {
+    bottom: calc(5px + env(safe-area-inset-bottom));
+    left: auto;
+    right: 8px;
+    transform: none;
+    box-shadow: none;
+}
+
 .chart-panel {
     position: relative;
-    width: min(96vw, 900px);
-    height: min(92vh, 1000px);
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-radius: 12px;
     background: #fff;
-    box-shadow: var(--shadow-lg);
+    /* The app zooms the chart itself (panels.js); the browser must not zoom the page. */
+    touch-action: pan-x pan-y;
 }
 
+/* ltr: plain scroll offsets when a zoomed chart scrolls sideways. */
 .chart-viewport {
     position: relative;
     flex: 1;
@@ -633,6 +644,8 @@ main {
     display: flex;
     padding: 8px;
     overflow: auto;
+    direction: ltr;
+    overscroll-behavior: contain;
 }
 
 /* Sized in JS to the chart's fitted box; the CSS limits are the fallback
@@ -673,13 +686,42 @@ main {
 .chart-status.error { color: #b91c1c; }
 
 .chart-footer {
-    padding: 10px;
-    text-align: center;
+    direction: ltr;
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    /* The right end is the nav pill's (see .viewer[data-kind="chart"] .viewer-nav). */
+    padding: 6px 176px calc(6px + env(safe-area-inset-bottom)) 10px;
     background: var(--surface);
     border-top: 1px solid var(--border);
 }
 
-.chart-footer a { color: var(--accent-hover); font-size: 0.9rem; }
+.chart-footer a { color: var(--accent-hover); font-size: 0.9rem; white-space: nowrap; }
+
+.chart-zoom { display: inline-flex; align-items: center; gap: 4px; }
+
+.chart-zoom-btn {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 6px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--fill);
+    color: var(--text);
+    font: inherit;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.chart-zoom-level { min-width: 54px; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 360px) {
+    .chart-footer a { display: none; }
+}
 
 /* ---------- Chart marks ---------- */
 
@@ -792,10 +834,8 @@ main {
     unicode-bidi: plaintext;
 }
 
-/* Leave room for the viewer's close button where the panel reaches it. */
-@media (max-width: 1000px) {
-    .marks-bar { padding-left: 64px; }
-}
+/* Leave room for the viewer's close button (the panel fills the screen). */
+.marks-bar { padding-left: 60px; min-height: 52px; }
 
 /* ---------- Manager password ---------- */
 
