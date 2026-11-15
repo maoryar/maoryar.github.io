@@ -465,7 +465,7 @@ main {
     text-overflow: ellipsis;
 }
 
-/* Under the title: the idle hint, or the loop's range. */
+/* Under the title: the loop's range; hidden when empty. */
 .player-time {
     unicode-bidi: plaintext;
     text-align: left;

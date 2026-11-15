@@ -51,9 +51,9 @@ export function bindTimeline(player) {
         track.setAttribute('aria-valuenow', String(Math.round(ready ? now : 0)));
         track.setAttribute('aria-valuetext', `${formatTime(now)} / ${formatTime(d)}`);
 
-        // The line under the title: the idle hint (main.js), else the loop.
+        // The line under the title: the loop's range, else empty (hidden).
         if (!loop) {
-            if (player.index >= 0) loopText.textContent = '';
+            loopText.textContent = '';
             return;
         }
         range.style.left = pct(loop.a, d);

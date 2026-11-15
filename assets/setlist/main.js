@@ -307,13 +307,13 @@ function bindPlayerUi(player, rows, viewer) {
         });
 
         // Always shown. Idle (nothing loaded yet): play starts the set from
-        // the song it names.
+        // the song it names; no line under the title.
         const idle = index < 0;
         bar.classList.toggle('idle', idle);
         if (idle) {
             const start = player.songs[startIndex(player, viewer)];
             title.textContent = start ? start.title : '—';
-            time.textContent = start ? 'לחצו ▶ לנגן מכאן' : '';
+            time.textContent = '';
         } else if (index !== failedIndex) {
             title.textContent = player.song.title;   // the times are on the timeline
         }
